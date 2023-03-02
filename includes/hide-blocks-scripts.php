@@ -10,6 +10,6 @@ function plugin_scripts() {
     );
 }
 
-add_action( 'admin_enqueue_scripts', 'plugin_scripts', 100 );
+add_action( 'admin_enqueue_scripts', 'plugin_scripts', 90 );
 
 ?>
