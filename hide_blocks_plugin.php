@@ -29,9 +29,9 @@ function hide_blocks_settings_page() {
     include( __DIR__ . '/templates/admin/settings-page.php' );
 }
 function hide_blocks_options() {
-    $available_blocks = getBlockVariations();
+    //$available_blocks = /* GET LIST OF ALL AVAILABLE BLOCKS */
     foreach ( $available_blocks as $block ) {
-        add_option( 'hide_blocks_option', ''); // add option somehow
+        add_option( 'hide_blocks_option', ''); // ADD OPTION SOMEHOW
         echo '<p>block here</p>';
     }
 }
