@@ -5,7 +5,7 @@
 
 <?php 
 
-// function hide_blocks_options() {
+// function blocks_options() {
 //     $available_blocks = getBlockVariations();
 //     foreach ( $available_blocks as $block ) {
 //         add_option( 'hide_blocks_option', ''); // add option somehow

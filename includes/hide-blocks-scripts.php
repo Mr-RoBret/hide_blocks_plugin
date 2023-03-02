@@ -1,6 +1,6 @@
 <?php 
 
-function hide_blocks_scripts() {
+function plugin_scripts() {
 
     wp_enqueue_script(
         'hide-blocks-admin',
@@ -10,6 +10,6 @@ function hide_blocks_scripts() {
     );
 }
 
-add_action( 'admin_enqueue_scripts', 'hide_blocks_scripts', 100 );
+add_action( 'admin_enqueue_scripts', 'plugin_scripts', 100 );
 
 ?>
