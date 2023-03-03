@@ -19,7 +19,6 @@ define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-fields.php' );
-include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-options.php' );
 
 // callback function to call markup for settings page
 function blocks_settings_page() {

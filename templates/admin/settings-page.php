@@ -13,7 +13,7 @@
         <?php do_settings_sections( 'hide-blocks' ); ?>
         
         <!-- Display Options -->
-        <?php esc_html_e( get_option( 'blocks_option' ) ); ?>
+        <?php // esc_html_e( get_option( 'blocks_option' ) ); ?>
 
         <!-- Default submit button -->
         <?php submit_button(); ?>
