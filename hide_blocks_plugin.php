@@ -18,6 +18,7 @@ if ( !defined( 'WPINC' ) ) {
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/show_all_blocks.php' );
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-fields.php' );
 
 // callback function to call markup for settings page
