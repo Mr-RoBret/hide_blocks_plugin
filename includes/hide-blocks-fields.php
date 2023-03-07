@@ -20,11 +20,11 @@ function blocks_settings() {
     
     add_settings_field(
         // unique identifier for field
-        'block_settings_checkbox',
+        'blocks_settings',
         // field title
         __( 'Available Blocks', 'hideblocks' ),
         // callback for field markup
-        'block_settings_checkbox_callback',
+        'show_all_blocks',
         // page to place on
         'hide-blocks',
         //section to place option in
@@ -40,40 +40,39 @@ function blocks_settings() {
     );
 }
 
-
-// calback function to enqueue js to return list of blocks registered
-function blocks_admin_scripts() {
-
-    wp_enqueue_script( 'settings-page', HIDEBLOCKS_URL . 'includes/show_all_blocks_admin.js', array('jquery'), true );
-    wp_localize_script( 'show_all_blocks_admin', 'allBlocksAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+function add_settings_field_callback() {
+    echo 'add_settings_field_callback here';
 }
 
+// callback function from add_settings_field to set up markup for settings fields
 function show_all_blocks() {
-    
-}
+    if ( isset( $_POST['blocks'] ) ) {
 
-add_action( 'admin_init', 'blocks_settings' );
-add_action( 'admin_enqueue_scripts', 'blocks_admin_scripts' );
-add_action( 'wp_ajax_show_all_blocks', 'show_all_blocks' );
+        $data = json_decode(file_get_contents("php://input"), true);
 
-// set up markup for settings field
-
-function block_settings_checkbox_callback( $args ) {
-    
-    // gets jQuery data from show_all_blocks_admin.js...
-
-    if ( isset( $_POST[ 'blocks' ] ) ) {
-        // Checkbox Field(s)
-        $blocks_array = json_decode( $_POST[ 'blocks' ] );
-        $blocks_array = explode( ',', $blocks_array );  
-        echo $blocks_array;  
-        
-        foreach ( $blocks_array as $block ) {
-            echo $block;
-        }
-    } else {
-        echo( '$_POST["blocks"] not set...' );
+        echo "stringified data, " . $data["blocks"];
+        echo PHP_EOL;
     }
+    echo 'esc_html_e( get_option( "blocks_option" ) ) is: ';
+    esc_html_e( get_option( 'blocks_option' ) );    
+
+    // gets jQuery data from show_all_blocks_admin.js...
+    // if ( isset( $_POST['blocks'] ) ) {
+
+    //     // Checkbox Field(s)
+    //     $blocks_array = ( $_POST[ 'blocks' ] );
+    //     // $blocks_array = $_REQUEST[ 'blocks' ];
+    //     echo $blocks_array;  
+    //     $blocks_array = explode( ',', $blocks_array );  
+        
+    //     foreach ( $blocks_array as $block ) {
+    //         echo $block;
+    //     }
+    // } else {
+    //     echo( '$_POST["blocks"] not set...' );
+    // }
+
+    die();
 
     // gets options from database and turns them into checklist...
 
@@ -89,10 +88,29 @@ function block_settings_checkbox_callback( $args ) {
         name="blocks_settings[checkbox]" 
         value="1"' . checked( 1, $checkbox, false ) . '/>';
     $html .= '&nbsp;';
-    $html .= '<label for="block_settings_checkbox">' . $args['label'] . '</label>';
+    $html .= '<label for="block_settings_checkbox">' . $checkbox['label'] . '</label>';
 
     echo $html;
     // esc_html_e( get_option( 'blocks_option' ) );    
 }
+
+// calback function to enqueue js to return list of blocks registered
+function blocks_admin_scripts() {
+    // global $pagenow;
+
+	// if ($pagenow != 'settings-page.php') {
+	// 	return;
+	// }
+    wp_enqueue_script(
+        'show-all-blocks-admin',
+        HIDEBLOCKS_URL . 'includes/show_all_blocks_admin.js',
+        array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
+        time()
+    );
+}
+
+add_action( 'admin_init', 'blocks_settings' );
+add_action( 'admin_enqueue_scripts', 'blocks_admin_scripts' );
+add_action( 'wp_ajax_show_all_blocks', 'show_all_blocks' );
 
 ?>

@@ -42,8 +42,10 @@ function add_settings_page() {
     );
 }
 
+
 /*** ACTIONS ***/
 add_action( 'admin_menu', 'add_settings_page' );
+add_action( 'admin_init', 'blocks_settings' );
 
 /*** FILTERS ***/
 // Add a link to the plugin's settings page in admin
