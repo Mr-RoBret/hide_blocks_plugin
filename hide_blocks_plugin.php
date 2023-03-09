@@ -10,10 +10,13 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: hideblocks
 */
 
+require( ABSPATH . '/wp-load.php' );
+
 // If this file is called directly, abort.
 if ( !defined( 'WPINC' ) ) {
-    die;
+    wp_die();
 }
+
 
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
@@ -45,7 +48,16 @@ function add_settings_page() {
 
 /*** ACTIONS ***/
 add_action( 'admin_menu', 'add_settings_page' );
-add_action( 'admin_init', 'blocks_settings' );
+add_action( 'init', 'ajax_script_enqueuer' );
+
+function ajax_script_enqueuer() {
+   wp_register_script( 'show_all_blocks_admin', HIDEBLOCKS_URL . 'includes/show_all_blocks_admin.js', array('jquery') );
+   wp_localize_script( 'show_all_blocks_admin', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
+
+   wp_enqueue_script( 'jquery' );
+   wp_enqueue_script( 'show_all_blocks_admin' );
+
+}
 
 /*** FILTERS ***/
 // Add a link to the plugin's settings page in admin

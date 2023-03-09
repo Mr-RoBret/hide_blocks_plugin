@@ -40,42 +40,22 @@ function blocks_settings() {
     );
 }
 
-function add_settings_field_callback() {
-    echo 'add_settings_field_callback here';
-}
-
 // callback function from add_settings_field to set up markup for settings fields
 function show_all_blocks() {
+    
+    // gets blocks list from array sent back from ajax function;
     if ( isset( $_POST['blocks'] ) ) {
 
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        echo "stringified data, " . $data["blocks"];
+        echo $_POST['blocks'];
+        $data = (json_decode($_POST['blocks']));
+        // var_dump(json_decode($data['blocks']));
+        echo "stringified data, " . $data;
         echo PHP_EOL;
     }
-    echo 'esc_html_e( get_option( "blocks_option" ) ) is: ';
-    esc_html_e( get_option( 'blocks_option' ) );    
-
-    // gets jQuery data from show_all_blocks_admin.js...
-    // if ( isset( $_POST['blocks'] ) ) {
-
-    //     // Checkbox Field(s)
-    //     $blocks_array = ( $_POST[ 'blocks' ] );
-    //     // $blocks_array = $_REQUEST[ 'blocks' ];
-    //     echo $blocks_array;  
-    //     $blocks_array = explode( ',', $blocks_array );  
-        
-    //     foreach ( $blocks_array as $block ) {
-    //         echo $block;
-    //     }
-    // } else {
-    //     echo( '$_POST["blocks"] not set...' );
-    // }
-
-    die();
+    echo esc_html_e( get_option( 'blocks_option' ) );
+    // esc_html_e( get_option( 'blocks_option' ) );  
 
     // gets options from database and turns them into checklist...
-
     $options = get_option( 'blocks_settings' );
 
     $checkbox = '';
@@ -88,9 +68,13 @@ function show_all_blocks() {
         name="blocks_settings[checkbox]" 
         value="1"' . checked( 1, $checkbox, false ) . '/>';
     $html .= '&nbsp;';
-    $html .= '<label for="block_settings_checkbox">' . $checkbox['label'] . '</label>';
+    // $html .= '<label for="block_settings_checkbox">' . $checkbox['label'] . '</label>';
 
     echo $html;
+
+      
+
+    wp_die();
     // esc_html_e( get_option( 'blocks_option' ) );    
 }
 
@@ -98,19 +82,18 @@ function show_all_blocks() {
 function blocks_admin_scripts() {
     // global $pagenow;
 
-	// if ($pagenow != 'settings-page.php') {
+	// if ($pagenow != 'hide-blocks') {
 	// 	return;
 	// }
-    wp_enqueue_script(
-        'show-all-blocks-admin',
+    wp_register_style( 'show-all-blocks-admin', 
         HIDEBLOCKS_URL . 'includes/show_all_blocks_admin.js',
         array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
-        time()
-    );
+        '1.0' );
+    wp_enqueue_script( 'show-all-blocks-admin' );
 }
 
-add_action( 'admin_init', 'blocks_settings' );
-add_action( 'admin_enqueue_scripts', 'blocks_admin_scripts' );
 add_action( 'wp_ajax_show_all_blocks', 'show_all_blocks' );
+add_action( 'admin_enqueue_scripts', 'blocks_admin_scripts' );
+add_action( 'admin_init', 'blocks_settings' );
 
 ?>
