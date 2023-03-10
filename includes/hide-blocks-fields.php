@@ -40,41 +40,55 @@ function blocks_settings() {
     );
 }
 
-// callback function from add_settings_field to set up markup for settings fields
-function show_all_blocks() {
+function get_all_blocks() {
+    $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+    $block_names = array();
+    foreach( $block_types as $key ) {
+        $block_names[] = $key->name;
+    }
+    // $block_names = json_encode($block_names);
+    // print_r('...............................................................' . $block_names);
     
-    // gets blocks list from array sent back from ajax function;
-    if ( isset( $_POST['blocks'] ) ) {
+    
+}
 
-        $data = ( $_POST[ 'blocks' ] );
-        var_dump( $data );
-        echo "stringified data, " . $data;
-        echo PHP_EOL;
+// callback function from add_settings_field to set up markup for settings fields
+function show_all_blocks($block_names) {
+    
+    foreach( $block_names as $option_name ) {
+        $option_label = $option_name;
+        add_option( $option_label, $option_label );
+    }
+    // gets blocks list from array sent back from ajax function;
+    if ( isset( $block_names ) ) {
+        
+        // esc_html_e( get_option( 'blocks_option' ) );  
+    
+        // gets options from database and turns them into checklist...
+        $options = esc_html_e( get_option( 'blocks_settings' ));
+    
+        $checkbox = '';
+        if ( isset( $options[ 'checkbox' ] ) ) {
+            $checkbox = esc_html( $options[ 'checkbox' ] );
+        }  
+        
+        $html = '<input type="checkbox" 
+            id="block_settings_checkbox" 
+            name="blocks_settings[checkbox]" 
+            value="1"' . checked( 1, $checkbox, false ) . '/>';
+        $html .= '&nbsp;';
+    
+        echo $html;
+        // $html .= '<label for="block_settings_checkbox">' . $checkbox['label'] . '</label>';
+        // wp_die();
+        
      }
 
-     // esc_html_e( get_option( 'blocks_option' ) );  
-
-    // // gets options from database and turns them into checklist...
-    // $options = get_option( 'blocks_settings' );
-
-    // $checkbox = '';
-    // if ( isset( $options[ 'checkbox' ] ) ) {
-    //     $checkbox = esc_html( $options[ 'checkbox' ] );
-    // }  
-    
-    // $html = '<input type="checkbox" 
-    //     id="block_settings_checkbox" 
-    //     name="blocks_settings[checkbox]" 
-    //     value="1"' . checked( 1, $checkbox, false ) . '/>';
-    // $html .= '&nbsp;';
-
-    // echo $html;
-    // // $html .= '<label for="block_settings_checkbox">' . $checkbox['label'] . '</label>';
-    // wp_die();
 
 }
 
-add_action( 'wp_ajax_show_all_blocks', 'show_all_blocks' );
 add_action( 'admin_init', 'blocks_settings' );
+add_action( 'wp_loaded', 'get_all_blocks' );
+add_action( 'admin_init', 'show_all_blocks' );
 
 ?>

@@ -17,7 +17,6 @@ if ( !defined( 'WPINC' ) ) {
     wp_die();
 }
 
-
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
@@ -45,22 +44,11 @@ function add_settings_page() {
     );
 }
 
-function ajax_script_enqueuer() {
-    // global $pagenow;
-
-	// if ($pagenow != 'settings-page') {
-	// 	return;
-	// }
-    wp_register_script( 'show_all_blocks_admin', HIDEBLOCKS_URL . 'includes/show_all_blocks_admin.js', array('jquery') );
-    wp_localize_script( 'show_all_blocks_admin', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
-    
-    wp_enqueue_script( 'jquery' );
-    wp_enqueue_script( 'show_all_blocks_admin' );
-}
-
 /*** ACTIONS ***/
 add_action( 'admin_menu', 'add_settings_page' );
-add_action( 'admin_enqueue_scripts', 'ajax_script_enqueuer');
+
+// add_action( 'admin_enqueue_scripts', 'ajax_script_enqueuer' );
+// add_action( 'enqueue_block_assets', 'ajax_script_enqueuer' );
 
 /*** FILTERS ***/
 // Add a link to the plugin's settings page in admin
