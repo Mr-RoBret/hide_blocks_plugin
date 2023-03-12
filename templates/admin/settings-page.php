@@ -11,9 +11,6 @@
 
         <!-- Display the settings sections for the page -->
         <?php do_settings_sections( 'hide-blocks' ); ?>
-        
-        <!-- Display Options -->
-        <?php //esc_html_e( get_option( 'blocks_option' ) ); ?>
 
         <!-- Default submit button -->
         <?php submit_button(); ?>
