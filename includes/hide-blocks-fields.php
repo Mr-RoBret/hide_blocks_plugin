@@ -1,115 +1,62 @@
 <?php 
+function option_markup() {
+   $options = get_option( 'blocks_settings' );
 
-// add section to settings page
+   $array_text = '';
+   if( isset( $options[ 'array_text' ] ) ) {
+    $array_text = esc_html( $options[ 'array_text' ] );
+   }
+
+   echo '<input type="text" id="hideblocks_array_text" name="blocks_settings[array_text]" value="' . $array_text . '" />';
+}
+
 function blocks_settings() {
+    // If plugin settings don't exist, create them
+    if( false == get_option( 'blocks_settings' ) ) {
+        add_option( 'blocks_settings' );
+    }
     
     add_settings_section(
         // unique identifier for section
-        'blocks_settings',
+        'select_blocks_section',
         // section title
-        __( 'Select Blocks Section', 'hideblocks' ),
+        __( 'Blocks to Include', 'hideblocks' ),
         // Callback for optional description
-        'add_plugin_description',
+        '',
         // Admin page to add section to
         'hide-blocks'
     );
-    
-    add_settings_field(
-        // unique identifier for field
-        'blocks_settings',
-        // field title
-        __( 'Available Blocks', 'hideblocks' ),
-        // callback for field markup
-        'show_all_blocks',
-        // page to place on
-        'hide-blocks',
-        //section to place option in
-        'select_blocks_section',
-        [
-            'label' => 'Available Blocks'
-        ]
-    );
-        
-    register_setting(
-        'blocks_settings', // group (correct name?)
-        'blocks_settings'  // specific setting we are registering
-    );
-}
-
-function get_all_blocks() {
-    $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
-    $block_names = array();
-    foreach( $block_types as $key ) {
-        $block_names[] = $key->name;
-    }
-
-    foreach( $block_names as $option_name ) {
-        // if block field not present, add
-        // if ( !in_array( $option_name, $block_names ) ) {
-            add_block_field($option_name);
-        // }
-    }
-
-}
-
-function add_block_field($option_name) {
-
-    $option_id = 'option-' . $option_name;
 
     add_settings_field(
         // unique identifier for field
-        $option_id,
+        'text-field-id',
         // field title
-        __( $option_name, 'hideblocks' ),
+        __( 'Blocks Array', 'hideblocks' ),
         // callback for field markup
         'option_markup',
         // page to place on
         'hide-blocks',
         //section to place option in
         'select_blocks_section',
-        [
-            'label' => $option_name
-        ]
     );
-    
+
+    register_setting(
+        'blocks_settings', // group (correct name?)
+        'blocks_settings'  // specific setting we are registering
+    );
 }
 
-// callback function from add_settings_field to set up markup for settings fields
-function show_all_blocks($block_names) {
-    
-    foreach( $block_names as $option_name ) {
-        $option_label = $option_name;
-        add_option( $option_label, $option_label );
+// gets all blocks and places them in array by name
+function get_all_blocks() {
+    $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+    $block_names = array();
+    foreach( $block_types as $key ) {
+        $block_names[] = $key->name;
     }
-    // gets blocks list from array sent back from ajax function;
-    if ( isset( $block_names ) ) {
-        
-        // esc_html_e( get_option( 'blocks_option' ) );  
-    
-        // gets options from database and turns them into checklist...
-        $options = esc_html_e( get_option( 'blocks_settings' ));
-    
-        $checkbox = '';
-        if ( isset( $option[ 'checkbox' ] ) ) {
-            $checkbox = esc_html( $option[ 'checkbox' ] );
-        }  
-        
-        // print_r('..................................' . $option_name);
-        
-        $html = '<input type="checkbox" 
-        id="'. $option_name . '_checkbox" 
-        name="blocks_settings[checkbox]" 
-        value="1"' . checked( 1, $checkbox, false ) . '/>';
-        $html .= '&nbsp;';
-        $html .= '<label for="' . $option_name . '_checkbox">' . $option_name . '</label>';
-        
-        echo $html;
-
-    //}
+    // print_r($block_names);
 }
 
 add_action( 'admin_init', 'blocks_settings' );
 add_action( 'wp_loaded', 'get_all_blocks' );
-add_action( 'admin_init', 'show_all_blocks' );
 
 ?>
