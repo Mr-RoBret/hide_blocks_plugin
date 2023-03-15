@@ -30,7 +30,7 @@ function main_markup() {
         echo '*' . $registered_block . '* ';
     }
 
-    $options = get_option( 'blocks_settings' );
+    $options = get_option( 'blocks_settings_main' );
 
     $array_text = '';
     if( isset( $options[ 'array_text' ] ) ) {
@@ -39,27 +39,30 @@ function main_markup() {
 
     echo '<br><br>
         <textarea id="hideblocks_array_text" 
-        name="blocks_settings[array_text]" 
+        name="blocks_settings_main[array_text]" 
         rows="5" cols="50">' . $array_text . '</textarea>';
 }
 
 function variation_markup() {
     echo '<p><strong>List of Embed Blocks Currently Registered:</strong></p>';
         
-    $options = get_option( 'blocks_settings' );
+    $options = get_option( 'blocks_settings_embed' );
 
     $variation_array_text = '';
     if( isset( $options[ 'variation_array_text' ] ) ) {
         $variation_array_text = esc_html( $options[ 'variation_array_text' ] );
     }
 
-    echo '<textarea id="hideblocks_variation_array_text" name="blocks_settings[variation_array_text]" rows="5" cols="50">' . $variation_array_text . '</textarea>';
+    echo '<textarea id="hideblocks_variation_array_text" name="blocks_settings_embed[variation_array_text]" rows="5" cols="50">' . $variation_array_text . '</textarea>';
 }
 
 function blocks_settings() {
     // If plugin settings don't exist, create them
-    if( false == get_option( 'blocks_settings' ) ) {
-        add_option( 'blocks_settings' );
+    if( false == get_option( 'blocks_settings_main' ) ) {
+        add_option( 'blocks_settings_main' );
+    }
+    if( false == get_option( 'blocks_settings_embed' ) ) {
+        add_option( 'blocks_settings_embed' );
     }
     
     add_settings_section(
@@ -69,6 +72,17 @@ function blocks_settings() {
         __( 'Blocks to Hide', 'hideblocks' ),
         // Callback for optional description
         'add_instructions',
+        // Admin page to add section to
+        'hide-blocks'
+    );
+
+    add_settings_section(
+        // unique identifier for section
+        'select_embeds_section',
+        // section title
+        __( 'Embed Blocks to Show', 'hideblocks' ),
+        // Callback for optional description
+        'add_embed_instructions',
         // Admin page to add section to
         'hide-blocks'
     );
@@ -98,18 +112,25 @@ function blocks_settings() {
         // page to place on
         'hide-blocks',
         //section to place option in
-        'select_blocks_section',
+        'select_embeds_section',
     );
 
     register_setting(
-        'blocks_settings', // group (correct name?)
-        'blocks_settings'  // specific setting we are registering
+        'blocks_settings_main', // group (correct name?)
+        'blocks_settings_main'  // specific setting we are registering
+    );
+    register_setting(
+        'blocks_settings_embed', // group (correct name?)
+        'blocks_settings_embed'  // specific setting we are registering
     );
 }
 
 function add_instructions() {
-    echo ("<p>Add names of blocks you would like to hide from the Block Selector.</p>
-        <p>Use the top field for Main blocks, and the bottom field for Variations (such as Embed blocks).</p>");
+    echo ("<p>Add names of blocks you would like to hide from the Block Selector.</p>");
+}
+
+function add_embed_instructions() {
+    echo ("<p>Add names of EMBED blocks you would like SHOWING in the Block Selector.</p>");
 }
 
 add_action( 'admin_init', 'blocks_settings' );
