@@ -69,7 +69,7 @@ function blocks_settings() {
         // unique identifier for section
         'select_blocks_section',
         // section title
-        __( 'Blocks to Hide', 'hideblocks' ),
+        __( 'Main Blocks to Hide', 'hideblocks' ),
         // Callback for optional description
         'add_instructions',
         // Admin page to add section to
@@ -116,11 +116,11 @@ function blocks_settings() {
     );
 
     register_setting(
-        'blocks_settings_main', // group (correct name?)
+        'settings_both_blocks', // group (correct name?)
         'blocks_settings_main'  // specific setting we are registering
     );
     register_setting(
-        'blocks_settings_embed', // group (correct name?)
+        'settings_both_blocks', // group (correct name?)
         'blocks_settings_embed'  // specific setting we are registering
     );
 }

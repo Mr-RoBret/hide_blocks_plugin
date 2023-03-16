@@ -4,11 +4,10 @@
         <?php esc_html_e( get_admin_page_title() ) ?>
     </h1>
 
-    <form method="post" action="options.php">
+    <form method="POST" action="options.php">
 
         <!-- Display necessary (security) hidden fields for settings -->
-        <?php settings_fields( 'blocks_settings_main' ); ?>
-        <?php settings_fields( 'blocks_settings_embed' ); ?>
+        <?php settings_fields( 'settings_both_blocks' ); ?>
 
         <!-- Display the settings sections for the page -->
         <?php do_settings_sections( 'hide-blocks' ); ?>
