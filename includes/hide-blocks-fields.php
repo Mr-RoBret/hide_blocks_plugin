@@ -24,11 +24,13 @@ function get_all_blocks() {
 function main_markup() {
 
     echo '<p><strong>List of Blocks Currently Registered:</strong></p>';
-        
-    $main_blocks_registry = get_all_blocks();
-    foreach( $main_blocks_registry as $registered_block ) {
-        echo '*' . $registered_block . '* ';
-    }
+    echo '<br>';
+        echo '<div id="list-blocks">';
+            $main_blocks_registry = get_all_blocks();
+            foreach( $main_blocks_registry as $registered_block ) {
+                echo '*' . $registered_block . '* ';
+            }
+        echo '</div>';
 
     $options = get_option( 'blocks_settings_main' );
 
@@ -45,6 +47,7 @@ function main_markup() {
 
 function variation_markup() {
     echo '<p><strong>List of Embed Blocks Currently Registered:</strong></p>';
+    echo '<br>';
         
     $options = get_option( 'blocks_settings_embed' );
 

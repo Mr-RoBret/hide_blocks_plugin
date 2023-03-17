@@ -29,7 +29,7 @@ wp.domReady(function () {
         
         // get list of block variations for type "embed"
         const embedArr = wp.blocks.getBlockVariations('core/embed');
-        console.log(embedArr);
+        // console.log(embedArr);
         
         // for each item in embed variations... 
         embedArr.forEach(function (blockVariation) {

@@ -15,8 +15,20 @@ function plugin_scripts() {
         array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
         time()
     );
+
 }
 
 add_action( 'admin_enqueue_scripts', 'plugin_scripts', 90 );
+
+function wp_loaded_scripts() {
+    wp_enqueue_script(
+        'style_embed_blocks',
+        HIDEBLOCKS_URL . 'style_embed_blocks.js',
+        array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
+        time()
+    );
+}
+
+add_action( 'admin_enqueue_scripts', 'wp_loaded_scripts', 75 );
 
 ?>
