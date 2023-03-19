@@ -11,7 +11,7 @@ global $wpdb;
 //     "
 // );
 
-$result = get_option('blocks_settings_main');
+$result = get_site_option('blocks_settings_main');
 echo json_encode($result);
 
     // $serial_value = json_encode($result[0]->option_value);

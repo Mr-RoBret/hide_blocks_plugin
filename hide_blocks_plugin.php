@@ -8,6 +8,7 @@ Author: Bret Farley
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html 
 Text Domain: hideblocks
+Network: true
 */
 
 if ( !defined('ABSPATH') )
@@ -19,17 +20,19 @@ if ( !defined( 'WPINC' ) ) {
     wp_die();
 }
 
+// echo network_admin_url( 'edit.php');
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
-include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-fields.php' );
-include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
 // callback function to call markup for settings page
 function blocks_settings_page() {
     if ( !current_user_can('manage_options') ) {
         return;
     }
+
     include( __DIR__ . '/templates/admin/settings-page.php' );
 }
 
@@ -48,7 +51,7 @@ function add_settings_page() {
 
 
 /*** ACTIONS ***/
-add_action( 'admin_menu', 'add_settings_page' );
+add_action( 'network_admin_menu', 'add_settings_page' );
 
 /*** FILTERS ***/
 // Add a link to the plugin's settings page in admin

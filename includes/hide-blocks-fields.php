@@ -32,7 +32,7 @@ function main_markup() {
             }
         echo '</div>';
 
-    $options = get_option( 'blocks_settings_main' );
+    $options = get_site_option( 'blocks_settings_main' );
 
     $array_text = '';
     if( isset( $options[ 'array_text' ] ) ) {
@@ -49,7 +49,7 @@ function variation_markup() {
     echo '<p><strong>List of Embed Blocks Currently Registered:</strong></p>';
     echo '<br>';
         
-    $options = get_option( 'blocks_settings_embed' );
+    $options = get_site_option( 'blocks_settings_embed' );
 
     $variation_array_text = '';
     if( isset( $options[ 'variation_array_text' ] ) ) {
@@ -60,14 +60,16 @@ function variation_markup() {
 }
 
 function blocks_settings() {
+    $default_blocks_option = '{"array_text": "core/site-logo, core/cover, core/post-content"}';
+    $default_embeds_option = '{"variation_array_text": "vimeo, youtube, instagram, imgur"}';
     // If plugin settings don't exist, create them
-    if( false == get_option( 'blocks_settings_main' ) ) {
-        add_option( 'blocks_settings_main' );
+    if( false == get_site_option( 'blocks_settings_main' ) ) {
+        add_site_option( 'blocks_settings_main', $default_blocks_option  );
     }
-    if( false == get_option( 'blocks_settings_embed' ) ) {
-        add_option( 'blocks_settings_embed' );
-    }
-    
+    if( false == get_site_option( 'blocks_settings_embed' ) ) {
+        add_site_option( 'blocks_settings_embed', $default_embeds_option );
+    } 
+
     add_settings_section(
         // unique identifier for section
         'select_blocks_section',

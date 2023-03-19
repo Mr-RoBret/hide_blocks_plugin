@@ -12,16 +12,19 @@ wp.domReady(function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
 
             const data = xhr.response;
-            const data_parsed = JSON.parse(data);
-            console.log(data_parsed);
-            const main_blocks_list = data_parsed['array_text'];
+            console.log(data);
 
-            allowed_main_blocks = main_blocks_list.split(', ');
-            // allowed_main_blocks.forEach( (item) => {
-            //     return item.trim();
-            // })
+            const data_parsed = JSON.parse(data);
+            const object_from_parsed = JSON.parse(data_parsed);
+            // console.log(object_from_parsed['array_text']);
+
+            const array_from_parsed = object_from_parsed['array_text'].split(', ');
+            // console.log(array_from_parsed);
+
+            for (let i in array_from_parsed) { 
+                allowed_main_blocks.push(array_from_parsed[i]); 
+            };
             // console.log(allowed_main_blocks);
-            // console.log(JSON.parse(embed_array));
 
         } else {
             console.log(`Error: ${xhr.status}`);

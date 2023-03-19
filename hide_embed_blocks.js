@@ -12,16 +12,20 @@ wp.domReady(function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
 
             const data = xhr.response;
+            console.log(data);
+
             const data_parsed = JSON.parse(data);
+            const object_from_parsed = JSON.parse(data_parsed);
+            // console.log(object_from_parsed['variation_array_text']);
 
-            const embeds_list = data_parsed['variation_array_text'];
+            const array_from_parsed = object_from_parsed['variation_array_text'].split(', ');
+            // console.log(array_from_parsed);
 
-            allowed_embeds_array = embeds_list.split(', ');
-            allowed_embeds_array.forEach( (item) => {
-                return item.trim();
-            })
-            console.log(allowed_embeds_array);
-            // console.log(JSON.parse(embed_array));
+            for (let i in array_from_parsed) { 
+                allowed_embeds_array.push(array_from_parsed[i]); 
+            };
+            // console.log(allowed_embeds_array);
+            
 
         } else {
             console.log(`Error: ${xhr.status}`);
@@ -35,6 +39,7 @@ wp.domReady(function () {
         embedArr.forEach(function (blockVariation) {
             //  if item doesn't exist in allowed blocks array, unregister from blocks 
             if (-1 === allowed_embeds_array.indexOf(blockVariation.name)) {
+                console.log('not allowed,' + blockVariation.name + '!');
                 wp.blocks.unregisterBlockVariation('core/embed', blockVariation.name);
             }
         });
