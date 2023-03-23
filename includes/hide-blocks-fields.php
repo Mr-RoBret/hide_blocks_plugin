@@ -1,5 +1,6 @@
 <?php 
 
+
 function get_all_blocks() {
     $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
     // $prefix_regex = "/[a-z]+\-?[a-z]+$/";
@@ -53,6 +54,7 @@ function variation_markup() {
 
     $variation_array_text = '';
     if( isset( $options[ 'variation_array_text' ] ) ) {
+        print_r($options[ 'variation_array_text' ]);
         $variation_array_text = esc_html( $options[ 'variation_array_text' ] );
     }
 
@@ -60,8 +62,10 @@ function variation_markup() {
 }
 
 function blocks_settings() {
-    $default_blocks_option = '{"array_text": "core/site-logo, core/cover, core/post-content"}';
-    $default_embeds_option = '{"variation_array_text": "vimeo, youtube, instagram, imgur"}';
+    // $default_blocks_option = '{"array_text": "core/site-logo, core/cover, core/post-content"}';
+    // $default_embeds_option = '{"variation_array_text": "vimeo, youtube, instagram, imgur"}';
+    $default_blocks_option = '';
+    $default_embeds_option = '';
     // If plugin settings don't exist, create them
     if( false == get_site_option( 'blocks_settings_main' ) ) {
         add_site_option( 'blocks_settings_main', $default_blocks_option  );

@@ -5,15 +5,8 @@
     </h1>
 
     <!-- <form method="POST" action="options.php"> -->
-    <!-- <form method="POST" action="edit.php?action=hide-blocks"> -->
-    <form method="POST" action="<?php echo esc_url( 
-        add_query_arg( 
-            'action', 
-            'hide-blocks', 
-            network_admin_url( 'edit.php' ) 
-        ) 
-    ); ?>">
-
+    <form method="POST" action="edit.php?action=hide-blocks">
+    
         <!-- Display necessary (security) hidden fields for settings -->
         <?php settings_fields( 'settings_both_blocks' ); ?>
 
@@ -26,3 +19,9 @@
     </form>
 
 </div>
+
+<?php 
+
+
+
+?>
