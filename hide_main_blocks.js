@@ -12,7 +12,7 @@ wp.domReady(function () {
         if (xhr.readyState == 4 && xhr.status == 200) {
 
             const data = xhr.response;
-            console.log(data);
+            console.log(JSON.parse(data));
 
             const data_parsed = JSON.parse(data);
             const object_from_parsed = JSON.parse(data_parsed);

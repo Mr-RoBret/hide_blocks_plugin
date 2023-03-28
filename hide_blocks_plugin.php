@@ -24,7 +24,6 @@ if ( !defined( 'WPINC' ) ) {
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
-// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-fields.php' );
 // include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
 class Settings_Page {
@@ -35,25 +34,41 @@ class Settings_Page {
      * @var string
      */
     protected $settings_slug = 'custom-network-settings';
+    protected $main_blocks_settings_slug = 'blocks_settings_main';
 
     /**
      * Class Constructor.
      */
     public function __construct() {
-        add_site_option($this->settings_slug, false);
-        add_site_option($this->settings_slug . '-sites', []);
+        add_site_option($this->main_blocks_settings_slug, false);
+        add_site_option($this->main_blocks_settings_slug . '-sites', ['this', 'that']);
+        add_action( 'network_admin_menu', array( $this, 'add_submenu' ) );   
+        add_action('network_admin_edit_' . $this->main_blocks_settings_slug, array( $this, 'updateNetworkSettings' ) );
+        
+        // add_site_option($this->settings_slug, false);
+        // add_site_option($this->settings_slug . '-sites', []);
+        
         // Register function for settings page creation.
         // add_action( 'network_admin_menu', array( $this, 'add_settings_page' ) );
-        add_action( 'network_admin_menu', array( $this, 'add_submenu' ) );        
+        // add_action('network_admin_edit_' . $this->main_blocks_settings_slug, [$this, 'updateNetworkSettings']);
+        
     }
         
     public function add_submenu() {
+        // If plugin settings don't exist, create them
+        // if( false == get_site_option( $this->main_blocks_settings_slug . '-sites' ) ) {
+        //     add_site_option( $this->main_blocks_settings_slug . '-sites', '' );
+        // }
+        // if( false == get_site_option( 'blocks_settings_embed' ) ) {
+        //     add_site_option( 'blocks_settings_embed', '' );
+        // }
 
         /**
          * Creates the sub-menu page and register the multisite settings.
          *
          * @return void
          */
+        
 
         // Create the submenu and register the page creation function.
         add_submenu_page(
@@ -61,8 +76,8 @@ class Settings_Page {
             __( 'Block Hider Plugin', 'multisite-settings' ),
             __( 'Block Hider', 'multisite-settings' ),
             'manage_network_options',
-            $this->settings_slug . '-page',
-            array( $this, 'create_page' ),
+            $this->main_blocks_settings_slug,
+            array( $this, 'create_page')
         );
 
         // Register a new section on the page.
@@ -70,17 +85,17 @@ class Settings_Page {
             'main-blocks-section',
             __( 'Main Blocks to Hide', 'multisite-settings' ),
             array( $this, 'add_instructions' ),
-            $this->settings_slug . '-page'
+            $this->main_blocks_settings_slug
         );
 
         // Register a variable and add a field to update it.
-        register_setting( $this->settings_slug . '-page', 'blocks_settings_main' );
+        register_setting( $this->main_blocks_settings_slug, $this->main_blocks_settings_slug . '-site' );
 
         add_settings_field(
             'text_input',
             __( 'Main Blocks Array', 'multisite-settings' ),
             array( $this, 'main_markup' ), // callback.
-            $this->settings_slug . '-page', // page.
+            $this->main_blocks_settings_slug, // page.
             'main-blocks-section' // section.
 
         );
@@ -102,16 +117,28 @@ class Settings_Page {
      * @return void
      */
     public function main_markup() {
-        $val = get_site_option( 'blocks_settings_main', '' );
-        // echo '<p><strong>List of Blocks Currently Registered:</strong></p>';
-        // echo '<br>';
-        // echo '<div id="list-blocks">';
-        //     $main_blocks_registry = get_all_blocks();
-        //     foreach( $main_blocks_registry as $registered_block ) {
-        //         echo '*' . $registered_block . '* ';
-        //     }
-        // echo '</div>';
-        echo '<textarea name="blocks_settings_main" rows="5" cols="50" value="' . esc_attr( $val ) . '" />';
+        //$val = get_site_option( 'blocks_settings_main', '' );
+        $options = get_site_option( $this->main_blocks_settings_slug . '-sites', '' );
+        print_r($options);
+        // $array_text = 'Place blocks array here...';
+
+        $array_text = 'Place blocks array here...';
+        if( isset( $options[ 'array_text' ] ) ) {
+            $array_text = esc_html( $options[ 'array_text' ] );
+        }
+
+        echo '<p><strong>List of Blocks Currently Registered:</strong></p>';
+        echo '<br>';
+        echo '<div id="list-blocks">';
+            $main_blocks_registry = get_all_blocks();
+            foreach( $main_blocks_registry as $registered_block ) {
+                echo '*' . $registered_block . '* ';
+            }
+        echo '</div><br>';
+        echo '<textarea 
+            name="array_text" 
+            rows="5" 
+            cols="50">' . $options . '</textarea>';
     }
 
     /**
@@ -126,15 +153,52 @@ class Settings_Page {
         <?php endif; ?>
         <div class="wrap">
         <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>
-        <form action="edit.php?action=<?php echo esc_attr( $this->settings_slug ); ?>-update" method="POST">
+        <form action="edit.php?action=<?php $this->main_blocks_settings_slug ?>" method="POST">
             <?php
-                settings_fields( $this->settings_slug . '-page' );
-                do_settings_sections( $this->settings_slug . '-page' );
+                settings_fields( $this->main_blocks_settings_slug );
+                do_settings_sections( $this->main_blocks_settings_slug );
                 submit_button();
             ?>
         </form>
         </div>
     <?php  }
+
+    /**
+   * Handle updating the network settings for the plugin.
+   * It's important to note that these settings update differently than for a single site installation.
+   * In particular, note the redirect at the end of the method
+   *
+   * @return void
+   */
+  public function updateNetworkSettings() {
+
+    // if (isset($_POST[$this->main_blocks_settings_slug . '-hidden']) && !isset($_POST[$this->main_blocks_settings_slug])  ) {
+    //   update_site_option($this->main_blocks_settings_slug, 0);
+    // } else {
+    //   update_site_option($this->main_blocks_settings_slug, $_POST[$this->main_blocks_settings_slug]);
+    // }
+    print_r( "...........................................Test" );
+
+    if (isset($_POST[$this->main_blocks_settings_slug . '-sites'])) {
+        update_site_option($this->main_blocks_settings_slug . '-sites', $_POST[$this->main_blocks_settings_slug . '-sites']);
+    } else {
+        update_site_option($this->main_blocks_settings_slug . '-sites', '');
+    }
+    
+    nocache_headers();
+
+    $queryArgs = add_query_arg(
+      [
+        'page' => $this->main_blocks_settings_slug,
+        'updated' => true
+      ],
+      network_admin_url('settings.php')
+    );
+
+    wp_redirect($queryArgs);
+
+    exit;
+  }
 
 }
   
@@ -163,41 +227,14 @@ function get_all_blocks() {
 }
 
 
-// callback function to call markup for settings page
-// function blocks_settings_page() {
-//     if ( !current_user_can('manage_options') ) {
-//         return;
-//     }
-
-//     include( __DIR__ . '/templates/admin/settings-page.php' );
-// }
-
-// // add settings page to menu
-// function add_settings_page() {
-//     add_menu_page(
-//         'Hide Blocks Plugin',
-//         'Hide Blocks',
-//         'manage_options',
-//         'hide-blocks',
-//         'blocks_settings_page', // callback to display plugin on page ('hide-blocks' slug)
-//         'dashicons-hidden',
-//         100
-//     );
-// }
-
-
-// /*** ACTIONS ***/
-// add_action( 'network_admin_menu', 'add_settings_page' );
-
 /*** FILTERS ***/
 // Add a link to the plugin's settings page in admin
-function add_settings_link( $links ) {
-    $settings_link = '<a href="admin.php?page="custom-network-settings">' . __( 'Settings', 'custom-network-settings' ) . '</a>';
-    array_push( $links, $settings_link );
-    return $links;
-}
+// function add_settings_link( $links ) {
+//     $settings_link = '<a href="admin.php?page="custom-network-settings">' . __( 'Settings', 'custom-network-settings' ) . '</a>';
+//     array_push( $links, $settings_link );
+//     return $links;
+// }
 
-$filter_name = "plugin_action_links_" . plugin_basename( __FILE__ );
-add_filter( $filter_name, 'add_settings_link' );
-
+// $filter_name = "plugin_action_links_" . plugin_basename( __FILE__ );
+// add_filter( $filter_name, 'add_settings_link' );
 ?>
