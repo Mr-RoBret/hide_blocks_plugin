@@ -33,7 +33,7 @@ function main_markup() {
             }
         echo '</div>';
 
-    $options = get_site_option( 'blocks_settings_main' );
+    $options = get_site_option( 'blocks-settings-main' );
 
     $array_text = '';
     if( isset( $options[ 'array_text' ] ) ) {
@@ -42,7 +42,7 @@ function main_markup() {
 
     echo '<br><br>
         <textarea id="hideblocks_array_text" 
-        name="blocks_settings_main[array_text]" 
+        name="blocks-settings-main[array_text]" 
         rows="5" cols="50">' . $array_text . '</textarea>';
 }
 
@@ -67,8 +67,8 @@ function blocks_settings() {
     $default_blocks_option = '';
     $default_embeds_option = '';
     // If plugin settings don't exist, create them
-    if( false == get_site_option( 'blocks_settings_main' ) ) {
-        add_site_option( 'blocks_settings_main', $default_blocks_option  );
+    if( false == get_site_option( 'blocks-settings-main' ) ) {
+        add_site_option( 'blocks-settings-main', $default_blocks_option  );
     }
     if( false == get_site_option( 'blocks_settings_embed' ) ) {
         add_site_option( 'blocks_settings_embed', $default_embeds_option );
@@ -126,7 +126,7 @@ function blocks_settings() {
 
     register_setting(
         'settings_both_blocks', // group (correct name?)
-        'blocks_settings_main'  // specific setting we are registering
+        'blocks-settings-main'  // specific setting we are registering
     );
     register_setting(
         'settings_both_blocks', // group (correct name?)
