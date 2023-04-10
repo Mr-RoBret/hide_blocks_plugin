@@ -2,19 +2,13 @@
 
 require( $_SERVER['DOCUMENT_ROOT'] . '/wp-load.php' );
 
+$networkID = get_current_network_id();
 global $wpdb;
-// $result = $wpdb->get_results(
-//     "
-//         SELECT *
-//         FROM `wp_sitemeta`
-//         WHERE `option_name` = 'blocks-settings-main-sites'
-//     "
-// );
+// $result = get_site_option( 'blocks-settings-main-sites' );
+$result = get_network_option( $networkID, 'blocks-settings-main-sites', 'not_available' );
 
-$result = get_site_option( 'blocks-settings-main-sites' );
-echo json_encode( $result );
+$data = json_encode( $result );
 
-    // $serial_value = json_encode($result[0]->option_value);
-    // echo $serial_value;
+return rest_ensure_response( $data );
 
 ?>

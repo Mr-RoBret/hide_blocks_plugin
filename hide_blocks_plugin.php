@@ -33,7 +33,6 @@ class Settings_Page {
      *
      * @var string
      */
-    protected $settings_slug = 'custom-network-settings';
     protected $main_blocks_settings_slug = 'blocks-settings-main';
 
     /**
@@ -44,16 +43,9 @@ class Settings_Page {
         $main_initial_value = array( 'array_text' => 'core/table, core/shortcode');
         // add_site_option($this->main_blocks_settings_slug, false);
         add_site_option($this->main_blocks_settings_slug . '-sites', [] );
-        update_site_option($this->main_blocks_settings_slug, $main_initial_value );
+        update_site_option($this->main_blocks_settings_slug . '-sites', $main_initial_value );
         add_action( 'network_admin_menu', array( $this, 'add_submenu' ) );   
         add_action('network_admin_edit_' . $this->main_blocks_settings_slug, array( $this, 'updateNetworkSettings' ) );
-        
-        // add_site_option($this->settings_slug, false);
-        // add_site_option($this->settings_slug . '-sites', []);
-        
-        // Register function for settings page creation.
-        // add_action( 'network_admin_menu', array( $this, 'add_settings_page' ) );
-        // add_action('network_admin_edit_' . $this->main_blocks_settings_slug, [$this, 'updateNetworkSettings']);
         
     }
         
@@ -71,8 +63,7 @@ class Settings_Page {
          *
          * @return void
          */
-        
-
+    
         // Create the submenu and register the page creation function.
         add_submenu_page(
             'settings.php',
@@ -114,21 +105,19 @@ class Settings_Page {
     }
     
     /**
-     * Creates and input field.
+     * Creates input field.
      *
      * @return void
      */
     public function main_markup() {
         //$val = get_site_option( 'blocks-settings-main', '' );
         $options = get_site_option( $this->main_blocks_settings_slug . '-sites' );
-        // $array_text = 'Place blocks array here...';
 
         $array_text = 'Place blocks array here...';
         if( isset( $options[ 'array_text' ] ) ) {
             $array_text = esc_html( $options['array_text'] );
         }
-
-        debug_to_console('Made it to main_markup');
+        // debug_to_console('Made it to main_markup');
 
         echo '<p><strong>List of Blocks Currently Registered:</strong></p>';
         echo '<br>';
@@ -156,15 +145,16 @@ class Settings_Page {
         </div>
         <?php endif; ?>
         <div class="wrap">
-        <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>
+            <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>   
 
-        <form action="edit.php?action=<?php $this->main_blocks_settings_slug ?>-update" method="POST">
-            <?php
-                settings_fields( $this->main_blocks_settings_slug );
-                do_settings_sections( $this->main_blocks_settings_slug );
-                submit_button();
-            ?>
-        </form>
+            <form action="edit.php?action=<?php $this->main_blocks_settings_slug ?>-update" method="POST">
+                <?php
+                    settings_fields( $this->main_blocks_settings_slug );
+                    do_settings_sections( $this->main_blocks_settings_slug );
+                    submit_button();
+                ?>
+            </form>
+
         </div>
     <?php  }
 
@@ -176,10 +166,8 @@ class Settings_Page {
    * @return void
    */
   public function updateNetworkSettings() {
- 
-    debug_to_console('Made it to updateNetworkSettings');
-    
-    check_admin_referer( $this->main_blocks_settings_slug .'-options');
+    // debug_to_console('Made it to updateNetworkSettings');
+    // check_admin_referer( $this->main_blocks_settings_slug .'-options');
 
     if (isset($_POST[$this->main_blocks_settings_slug . '-sites'])) {
         update_site_option($this->main_blocks_settings_slug . '-sites', $_POST[$this->main_blocks_settings_slug . '-sites']);
@@ -220,10 +208,8 @@ function get_all_blocks() {
         if( $success ) {
             // preg_match( $prefix_regex, $name, $matches );
             array_push( $block_names_verified, $name ); // echo '<p>' . $matches[0] . ', </p></br>';
-            // print_r( $matches[0] );
         }
     }
-    // print_r( $block_names_truncated );
     return $block_names_verified;
 }
 
