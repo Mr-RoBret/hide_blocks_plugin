@@ -2,19 +2,33 @@
 
 // when dom is ready, assign blocks we want showing to array 
 wp.domReady(function () {
-    var allowed_main_blocks = [];
     
-    const url = '/wp-content/plugins/hide_blocks_plugin/get_main_blocks.php';
+    const test_url = '/wp-json/';
     
-    fetch(url, {
-        method: "GET"
+    fetch(test_url, {
+        method: 'GET'
     })
     .then(response => response.json())
-    .then(json => {
-        console.log('parsed json', json)
-    })
     .then(data => {
-        console.log(data);
+        console.log('API Index:', data);
+    })
+    .catch(error => {
+        //handle errors
+        console.log('api index error');
+    })
+}); 
+
+wp.domReady(function () {
+    const allowed_main_blocks = [];
+    
+    const url = '/wp-json/hide_blocks_plugin/v1/main-blocks';
+    
+    fetch(url, {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('data received:', data);
     })
     .catch(error => {
         //handle errors

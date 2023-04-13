@@ -16,9 +16,9 @@ if ( !defined('ABSPATH') )
 require( ABSPATH . '/wp-load.php' );
 
 // If this file is called directly, abort.
-if ( !defined( 'WPINC' ) ) {
-    wp_die();
-}
+// if ( !defined( 'WPINC' ) ) {
+//     wp_die();
+// }
 
 // echo network_admin_url( 'edit.php');
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
