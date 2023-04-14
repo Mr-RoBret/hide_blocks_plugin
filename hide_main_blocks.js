@@ -21,17 +21,18 @@ wp.domReady(function () {
 wp.domReady(function () {
     const allowed_main_blocks = [];
     
-    const url = '/wp-json/hide_blocks_plugin/v1/main-blocks';
+    // const url = '/wp-json/hide_blocks_plugin/v1/main-blocks';
     
-    fetch(url, {
+    fetch('/wp-json/hide_blocks_plugin/v1/main-blocks', {
         method: 'GET'
     })
     .then(response => response.json())
-    .then(data => {
-        console.log('data received:', data);
+    .then(json => {
+        console.log('data received:', json);
     })
     .catch(error => {
         //handle errors
+        console.error(error);
         console.log('errored out');
     })
 });   
