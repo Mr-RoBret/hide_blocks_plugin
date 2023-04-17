@@ -1,34 +1,34 @@
 // Code to hide main blocks
 
 // when dom is ready, assign blocks we want showing to array 
-wp.domReady(function () {
+// wp.domReady(function () {
     
-    const test_url = '/wp-json/';
+//     const test_url = '/wp-json/';
     
-    fetch(test_url, {
-        method: 'GET'
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('API Index:', data);
-    })
-    .catch(error => {
-        //handle errors
-        console.log('api index error');
-    })
-}); 
+//     fetch(test_url, {
+//         method: 'GET'
+//     })
+//     .then(response => response.json())
+//     .then(data => {
+//         console.log('API Index:', data);
+//     })
+//     .catch(error => {
+//         //handle errors
+//         console.log('api index error');
+//     })
+// }); 
 
 wp.domReady(function () {
     const allowed_main_blocks = [];
     
     // const url = '/wp-json/hide_blocks_plugin/v1/main-blocks';
     
-    fetch('/wp-json/hide_blocks_plugin/v1/main-blocks', {
+    fetch('/wp-json/blocks-settings-main/v1/main-blocks', {
         method: 'GET'
     })
     .then(response => response.json())
-    .then(json => {
-        console.log('data received:', json);
+    .then(data => {
+        console.log('data received:', data);
     })
     .catch(error => {
         //handle errors

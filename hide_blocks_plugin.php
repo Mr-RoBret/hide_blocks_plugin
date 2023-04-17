@@ -21,6 +21,7 @@ if ( !defined( 'WPINC' ) ) {
 }
 
 // echo network_admin_url( 'edit.php');
+// print_r( plugin_dir_url( __FILE__ ) );
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );

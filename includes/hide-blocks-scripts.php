@@ -7,15 +7,15 @@ function plugin_scripts() {
         // '/app/public/wp-content/plugins/hide_blocks_plugin/hide_main_blocks.js',
         HIDEBLOCKS_URL . 'hide_main_blocks.js',
         array( 'wp-blocks', 'wp-dom', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
-        time()
+        '1.0.0'
     );
     
     wp_enqueue_script(
         'hide_embed_blocks',
         // '/app/public/wp-content/plugins/hide_blocks_plugin/hide_embed_blocks.js',
-        HIDEBLOCKS_URL . '/hide_embed_blocks.js',
+        HIDEBLOCKS_URL . 'hide_embed_blocks.js',
         array( 'wp-blocks', 'wp-dom', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
-        time()
+        '1.0.0'
     );
 
 }

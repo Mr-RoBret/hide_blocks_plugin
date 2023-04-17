@@ -15,7 +15,7 @@
 
     function multisite_settings_register_api_routes() {
 
-        register_rest_route( 'hide_blocks_plugin/v1', '/main-blocks', array(
+        register_rest_route( 'blocks-settings-main/v1', '/main-blocks', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => 'multisite_settings_get_main_blocks',
             'permission_callback' => function() {
