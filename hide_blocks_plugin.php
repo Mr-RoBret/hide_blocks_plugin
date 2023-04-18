@@ -46,7 +46,7 @@ class Settings_Page {
         add_site_option($this->main_blocks_settings_slug . '-sites', [] );
         update_site_option($this->main_blocks_settings_slug . '-sites', $main_initial_value );
         add_action( 'network_admin_menu', array( $this, 'add_submenu' ) );   
-        add_action('network_admin_edit_' . $this->main_blocks_settings_slug, array( $this, 'updateNetworkSettings' ) );
+        add_action('network_admin_edit_' . $this->main_blocks_settings_slug . '-update', array( $this, 'updateNetworkSettings' ) );
         
     }
         
@@ -78,7 +78,7 @@ class Settings_Page {
         // Register a new section on the page.
         add_settings_section(
             'main-blocks-section',
-            __( 'Main Blocks to Hide', 'multisite-settings' ),
+            __( 'Blocks to Display in Block Inserter', 'multisite-settings' ),
             array( $this, 'add_instructions' ),
             $this->main_blocks_settings_slug
         );
@@ -140,7 +140,8 @@ class Settings_Page {
         <div class="wrap">
             <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>   
 
-            <form action="edit.php?action=<?php $this->main_blocks_settings_slug ?>-update" method="POST">
+            <!-- <form action="edit.php?action=<?php $this->main_blocks_settings_slug ?>" method="POST"> -->
+            <form action="edit.php?action=<?php echo esc_attr( $this->main_blocks_settings_slug . '-update'); ?>" method="POST">
                 <?php
                     settings_fields( $this->main_blocks_settings_slug );
                     do_settings_sections( $this->main_blocks_settings_slug );
