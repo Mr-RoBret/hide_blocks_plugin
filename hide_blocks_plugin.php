@@ -83,17 +83,39 @@ class Settings_Page {
             $this->main_blocks_settings_slug
         );
 
-        // Register a variable and add a field to update it.
+        // callback function for add_settings_field
+        function multisite_settings_checkbox_callback( $args ) {
+            $checkboxes_list = get_site_option( 'main-blocks-section' );
+    
+            $checkbox = '';
+            if( isset( $checkboxes_list['checkbox'] ) ) {
+                $checkbox = esc_html( $checkboxes_list['checkbox'] );
+            }
+    
+            $html = '<input type="checkbox" 
+                id="multisite_settings_checkbox_' . $args['label'] .'" 
+                name="multisite_settings[checkbox]" value="1"' . checked( 1, $checkbox, false ) . '/>';
+            $html .= '  ';
+            $html .= '<label for="multisite_settings_checkbox_' . $args['label'] . '">' . $args['label'] . '</label>';   
+            
+            echo $html;
+        }
+    
+        $main_blocks_registry = get_all_blocks();
+        foreach( $main_blocks_registry as $key=>$value ) {
+
+            add_settings_field(
+                'multisite-settings_checkbox' . $key,
+                __( '', 'multisite-settings' ),
+                'multisite_settings_checkbox_callback',
+                $this->main_blocks_settings_slug,
+                'main-blocks-section',
+                [
+                    'label' => $value
+                ]
+            );
+        }        
         register_setting( $this->main_blocks_settings_slug, $this->main_blocks_settings_slug . '-sites' );
-
-        add_settings_field(
-            'text_input',
-            __( 'Main Blocks Array', 'multisite-settings' ),
-            array( $this, 'main_markup' ), // callback.
-            $this->main_blocks_settings_slug, // page.
-            'main-blocks-section' // section.
-
-        );
     }
     
     /**
@@ -102,37 +124,7 @@ class Settings_Page {
      * @return void
      */
     public function add_instructions() {
-        esc_html_e( 'Add names of blocks you would like to hide from the Block Selector.', 'multisite-settings' );
-    }
-    
-    /**
-     * Creates input field.
-     *
-     * @return void
-     */
-    public function main_markup() {
-        //$val = get_site_option( 'blocks-settings-main', '' );
-        $options = get_site_option( $this->main_blocks_settings_slug . '-sites' );
-
-        $array_text = 'Place blocks array here...';
-        if( isset( $options[ 'array_text' ] ) ) {
-            $array_text = esc_html( $options['array_text'] );
-        }
-        // debug_to_console('Made it to main_markup');
-
-        echo '<p><strong>List of Blocks Currently Registered:</strong></p>';
-        echo '<br>';
-        echo '<div id="list-blocks">';
-            $main_blocks_registry = get_all_blocks();
-            foreach( $main_blocks_registry as $registered_block ) {
-                echo '*' . $registered_block . '* ';
-            }
-        echo '</div><br>';
-        echo '<textarea 
-            id="multisite-settings_array_text"
-            name="' . $this->main_blocks_settings_slug . '-sites[array_text]" 
-            rows="5" 
-            cols="50">' . $array_text . '</textarea>';
+        esc_html_e( 'Please check the blocks you would like visible in the Block Inserter.', 'multisite-settings' );
     }
 
     /**
@@ -213,6 +205,24 @@ function get_all_blocks() {
     }
     return $block_names_verified;
 }
+
+/**
+ * function to retrieve an array from options not selected 
+ * and hide them from the block insterter
+ * 
+ * @return array
+ * 
+ */
+function stolaf_allowed_block_types() {
+    return array(
+        'core/paragraph',
+        'core/heading',
+        'core/list',
+    );
+}
+
+add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
+
 
 /**
  * Simple helper to debug to the console
