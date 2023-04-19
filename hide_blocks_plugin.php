@@ -27,115 +27,131 @@ define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 // include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 // include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
-class Settings_Page {
-
-    /**
-     * This will be used for the SubMenu URL in the settings page and to verify which variables to save.
-     *
-     * @var string
-     */
-    protected $main_blocks_settings_slug = 'blocks-settings-main';
+$main_blocks_settings_slug = 'blocks-settings-main';
 
     /**
      * Class Constructor.
      */
-    public function __construct() {
 
-        // $main_initial_value = array( 'array_text' => 'core/table, core/shortcode');
-        // add_site_option($this->main_blocks_settings_slug, false);
-
-        //add_site_option($this->main_blocks_settings_slug . '-sites', [] );
-        //update_site_option($this->main_blocks_settings_slug . '-sites', [] );
-        add_action( 'network_admin_menu', array( $this, 'add_submenu' ) );   
-        add_action('network_admin_edit_' . $this->main_blocks_settings_slug . '-update', array( $this, 'updateNetworkSettings' ) );
-        
-    }
-        
-    public function add_submenu() {
-        // If plugin settings don't exist, create them
-        if( false == get_site_option( $this->main_blocks_settings_slug . '-sites' ) ) {
-            add_site_option( $this->main_blocks_settings_slug . '-sites', '' );
-        }
-        // if( false == get_site_option( 'blocks_settings_embed' ) ) {
-        //     add_site_option( 'blocks_settings_embed', '' );
-        // }
-
-        /**
-         * Creates the sub-menu page and register the multisite settings.
-         *
-         * @return void
-         */
+        add_action( 'network_admin_menu', 'add_submenu' );  
+        add_action('network_admin_edit_' . $main_blocks_settings_slug . '-update', 'update_network_setting' );
     
+    /**
+     * function triggered by 'network_admin_menu' hook
+     */
+    function add_submenu() {
+        $main_blocks_settings_slug = 'blocks-settings-main';
+        // If plugin settings don't exist, create them
+        if( false == get_site_option( $main_blocks_settings_slug . '-NEW' ) ) {
+            add_site_option( $main_blocks_settings_slug . '-NEW', '');
+        }
+
         // Create the submenu and register the page creation function.
         add_submenu_page(
             'settings.php',
             __( 'Block Hider Plugin', 'multisite-settings' ),
             __( 'Block Hider', 'multisite-settings' ),
             'manage_network_options',
-            $this->main_blocks_settings_slug,
-            array( $this, 'create_page')
+            $main_blocks_settings_slug,
+            'create_page'
         );
 
         // Register a new section on the page.
         add_settings_section(
             'main-blocks-section',
             __( 'Blocks to Display in Block Inserter', 'multisite-settings' ),
-            array( $this, 'add_instructions' ),
-            $this->main_blocks_settings_slug
+            'add_instructions',
+            $main_blocks_settings_slug
         );
 
         // callback function for add_settings_field
         function multisite_settings_checkbox_callback( $args ) {
+            // debug_to_console('current label is ' . $args['label']);
             
-            $main_option = get_site_option( 'blocks-settings-main-sites' );
-            debug_to_console($main_option);
-            // $current_option = $main_option[ $args['index'] ];
-            // debug_to_console($current_option);
+            $main_option = get_site_option( 'blocks-settings-main-NEW' );
+            // debug_to_console('args index is: ' . $main_option[$args['index']]);
 
-            // if current_option is checked
-            // $checkbox = '';
-            // if( isset( $current_option['checkbox'] ) ) {
-                
-            //     debug_to_console('multisite-settings_checkbox_' . $args['label'] . ' was checked');
-            //     $checkbox = esc_html( $current_option['checkbox'] );
-            // }
+            $checkboxes_field = '';
+            if( isset( $main_option[ 'checkboxes_field' ] ) ) {
+                $checkboxes_field = esc_html( $main_option[ 'checkboxes_field' ] );
+            }
 
-            $checkboxes_field = isset( $main_option['blocks-settings-main-sites'] )
-                ? (array) $main_option['blocks-settings-main-sites'] : [];
+            // $checkboxes_field = isset( $main_option[$args['index']] )
+            //     ? (array) $main_option[$args['index']] : [];
+            // debug_to_console( 'checkboxes_field is" ' . $checkboxes_field['label'] );
 
             $html = '<input type="checkbox" 
-                name="blocks-settings-main-sites[checkboxes_field][]"' . checked( in_array($args['label'], $checkboxes_field ), 1 ) . 
-                'value="' . $args['label'] . '"';
-                // id="multisite_settings_checkbox_' . $args['index'] .'" 
-                // name="multisite_settings_checkbox[checkbox]" value="1"' . checked( 1, $checkbox, false ) . '/>';
+                name="blocks-settings-main-NEW[checkboxes_field]" 
+                id="multisite_settings_checkbox"
+                "value="on"' . checked( "on", $checkboxes_field, false ) . '/>';
+                 
             $html .= '&nbsp;';
-            $html .= '<label for="blocks-settings-main-sites[checkboxes_field][]">' . $args['label'] . '</label>';   
+
+            $html .= '<label for="blocks-settings-main-NEW">' . $args['label'] . '</label>';   
             
             echo $html;
         }
+
+        // // callback function for add_settings_field
+        // function multisite_settings_checkbox_callback( $args ) {
+        //     // debug_to_console('current label is ' . $args['label']);
+            
+        //     $main_option = get_site_option( 'blocks-settings-main-NEW' );
+        //     // debug_to_console('args index is: ' . $main_option[$args['index']]);
+
+        //     $checkboxes_field = '';
+        //     if( isset( $main_option[ 'checkboxes_field' ] ) ) {
+        //         $checkboxes_field = esc_html( $main_option[ 'checkboxes_field' ] );
+        //     }
+
+        //     // $checkboxes_field = isset( $main_option[$args['index']] )
+        //     //     ? (array) $main_option[$args['index']] : [];
+        //     // debug_to_console( 'checkboxes_field is" ' . $checkboxes_field['label'] );
+
+        //     $html = '<input type="checkbox" 
+        //         name="blocks-settings-main-NEW[checkboxes_field]" 
+        //         id="multisite_settings_checkbox_' . $args['index'] . '
+        //         "value="1"' . checked( 1, $checkboxes_field, false ) . '/>';
+                 
+        //     $html .= '&nbsp;';
+
+        //     $html .= '<label for="blocks-settings-main-NEW[checkboxes_field]">' . $args['label'] . '</label>';   
+            
+        //     echo $html;
+        // }
     
         // Register new option for each block in list of all blocks available
         // Add a settings field for each one and check to see (in callback) 
         // if checked already in database
         $main_blocks_registry = get_all_blocks();
 
-        
-        foreach( $main_blocks_registry as $key=>$value ) {
-            // debug_to_console($value);
-            add_settings_field(
-                'multisite-settings_checkbox_' . $key,   // id of field
-                __( '', 'multisite-settings' ),         // title of field to display
-                'multisite_settings_checkbox_callback', // callback function
-                $this->main_blocks_settings_slug,       // page to display it on
-                'main-blocks-section',                  // section on page to display in
-                [
-                    'index' => $key,
-                    'label' => $value
-                ]
-            );
+        add_settings_field(
+            'multisite-settings_checkbox',   // id of field
+            __( '', 'multisite-settings' ),         // title of field to display
+            'multisite_settings_checkbox_callback', // callback function
+            $main_blocks_settings_slug,       // page to display it on
+            'main-blocks-section',                  // section on page to display in
+            [
+                'label' => 'Test Checkbox Field'
+            ]
+        );
+
+        // foreach( $main_blocks_registry as $key=>$value ) {
+        //     // debug_to_console($value);
+        //     add_settings_field(
+        //         'multisite-settings_checkbox_' . $key,   // id of field
+        //         __( '', 'multisite-settings' ),         // title of field to display
+        //         'multisite_settings_checkbox_callback', // callback function
+        //         $main_blocks_settings_slug,       // page to display it on
+        //         'main-blocks-section',                  // section on page to display in
+        //         [
+        //             'index' => $key,
+        //             'label' => $value
+        //         ]
+        //     );
             // debug_to_console( 'multisite-settings_checkbox_' . $key );
-        }        
-        register_setting( 'main-blocks-section', $this->main_blocks_settings_slug . '-sites' );
+        // }        
+        register_setting( 'main-blocks-section', $main_blocks_settings_slug . '-NEW' );
     }
     
     /**
@@ -143,14 +159,15 @@ class Settings_Page {
      *
      * @return void
      */
-    public function add_instructions() {
+    function add_instructions() {
         esc_html_e( 'Please check the blocks you would like visible in the Block Inserter.', 'multisite-settings' );
     }
 
     /**
      * This creates the settings page itself.
      */
-    public function create_page() {
+    function create_page() {
+        $main_blocks_settings_slug = 'blocks-settings-main';
         ?>
         <?php if ( isset( $_GET['updated'] ) ) : ?>
             <div id="message" class="updated notice is-dismissible">
@@ -160,10 +177,10 @@ class Settings_Page {
             <div class="wrap">
                 <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>   
 
-                <form method="post" action="<?php echo add_query_arg( 'action', $this->main_blocks_settings_slug . '-update', 'edit.php' ) ?>">
+                <form method="post" action="<?php echo add_query_arg( 'action', $main_blocks_settings_slug . '-update', 'edit.php' ) ?>">
                     <?php
                         settings_fields( 'main-blocks-section' );
-                        do_settings_sections( $this->main_blocks_settings_slug );
+                        do_settings_sections( $main_blocks_settings_slug );
                         submit_button();
                     ?>
                 </form>
@@ -180,31 +197,35 @@ class Settings_Page {
      *
      * @return void
      */
-    public function updateNetworkSettings() {
-        debug_to_console('Made it to updateNetworkSettings');
-        // check_admin_referer( $this->main_blocks_settings_slug .'-options');
+    function update_network_setting() {
+        $main_blocks_settings_slug = 'blocks-settings-main';
+        debug_to_console('Made it to update_network_setting');
+        // check_admin_referer( $main_blocks_settings_slug .'-options');
 
         // get array of checked options in list,
-        $options_arr = get_site_option( $this->main_blocks_settings_slug . '-sites' );
-        foreach($options_arr as $option) { 
+        // $options_arr = get_site_option( $main_blocks_settings_slug . '-NEW' );
+        // foreach($options_arr as $option) { 
 
-             if(isset($_POST[$this->main_blocks_settings_slug . '-sites'[$option] ])) {
-                 update_site_option($this->main_blocks_settings_slug . '-sites'[$option], $_POST[$this->main_blocks_settings_slug . '-sites'[$option] ]);
-             } else {
-                update_site_option($this->main_blocks_settings_slug . '-sites'[$option], '');
-            } 
-        }   
-        // if (isset($_POST[$this->main_blocks_settings_slug . '-sites'])) {
-        //     update_site_option($this->main_blocks_settings_slug . '-sites', $_POST[$this->main_blocks_settings_slug . '-sites']);
-        // } else {
-        //     update_site_option($this->main_blocks_settings_slug . '-sites', '');
+        //      if(isset($_POST[$main_blocks_settings_slug . '-NEW'[$option] ])) {
+        //          update_site_option($main_blocks_settings_slug . '-NEW'[$option], $_POST[$main_blocks_settings_slug . '-NEW'[$option] ]);
+        //      } else {
+        //         update_site_option($main_blocks_settings_slug . '-NEW'[$option], '');
+        //     } 
         // }
+        
+        // update_site_option(  $main_blocks_settings_slug . '-NEW', $_POST[ $main_blocks_settings_slug . '-NEW' ] );
+
+        if (isset($_POST[$main_blocks_settings_slug . '-NEW'])) {
+            update_site_option($main_blocks_settings_slug . '-NEW', $_POST[$main_blocks_settings_slug . '-NEW']);
+        } else {
+            update_site_option($main_blocks_settings_slug . '-NEW', '');
+        }
         
         // nocache_headers();
 
         $queryArgs = add_query_arg(
         [
-            'page' => $this->main_blocks_settings_slug,
+            'page' => $main_blocks_settings_slug,
             'updated' => true,
         ],
         network_admin_url( 'settings.php' )
@@ -214,10 +235,9 @@ class Settings_Page {
 
         exit;
     }
-}
   
 // Initialize the execution.
-new Settings_Page();
+// new Settings_Page();
 
 function get_all_blocks() {
     $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
