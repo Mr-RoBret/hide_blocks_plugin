@@ -22,10 +22,13 @@ if ( !defined( 'WPINC' ) ) {
 
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
-// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+include( plugin_dir_path( __FILE__ ) . 'get_main_blocks.php' );
+
 // include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
+$main_blocks_allowed_array = [];
 
 add_action( 'network_admin_menu', 'add_submenu' );  
 add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'update_network_setting' );
@@ -76,17 +79,21 @@ function add_submenu() {
         );
     }
     
+    // callback function to create html for each option and check its status
     function multisite_settings_checkbox_callback( $args ) {
-
         $option = get_site_option( $args['field_name'] );
         $option_name = $args['field_name'];
+        $block_name = $args['label'];
     
         $checkboxes_field = '';
         if( isset( $option[ 'checkboxes_field' ] ) ) {
             $checkboxes_field = esc_html( $option[ 'checkboxes_field' ] );
+            array_push($GLOBALS[ 'main_blocks_allowed_array' ], $block_name);
         }
- 
-        // create html
+        
+        debug_to_console($GLOBALS[ 'main_blocks_allowed_array' ]);
+
+        // create html for current option
         $html = '<input type="checkbox" 
             name="' . $option_name . '[checkboxes_field]" 
             id="block_checkbox_' . $args['label'] . '"
@@ -99,14 +106,16 @@ function add_submenu() {
         echo $html;
     }
 
+    // loop through every block in registry and add option if no option exists;
+    // then send to callback functions to add settings field and create html. 
     foreach( $main_blocks_registry as $key=>$value ) {
-        
         // If plugin settings don't exist, create them
         if( false == get_site_option( 'block_checkbox_' . $value ) ) {
             add_site_option( 'block_checkbox_' . $value, '' );
         }
         individual_settings_checkbox_callback( $key, $value );
 
+        // register setting for newly created checkbox option
         register_setting( 'main-blocks-section', 'block_checkbox_' . $value );   
     }
 }
@@ -158,7 +167,7 @@ function update_network_setting() {
     debug_to_console('Made it to update_network_setting');
 
     // check_admin_referer( $main_blocks_settings_slug .'-options');
-
+    
     // get array of checked options in list,
     $options_arr = get_all_blocks();
 
@@ -207,17 +216,22 @@ function get_all_blocks() {
 
 /**
  * function to retrieve an array from options not selected 
- * and hide them from the block insterter
+ * and hide them from the block insterter // Somehow this needs to run ** later ** than it currently runs. 
  * 
  * @return array
  * 
  */
-function stolaf_allowed_block_types() {
-    return array(
-        'core/paragraph',
-        'core/heading',
-        'core/list',
-    );
+function stolaf_allowed_block_types( ) {
+    if( isset( $_GET['BLOCKSDATA' ] ) ) {
+        debug_to_console('$_GET returns: ' . $_GET['BLOCKSDATA']);
+        return $_GET['BLOCKSDATA']['blocks_array'];
+    }
+    // $blocks_to_string = implode( ", ", $allowed_blocks_arr );
+    // return array(
+    //     'core/separator', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns',
+    // );
+ 
+    // return $response;
 }
 
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
