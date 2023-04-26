@@ -8,7 +8,7 @@ wp.domReady(function () {
         mode: 'cors',
         headers: {
             'Access-Control-Allow-Origin' : '*',
-            'X-WP-Header' : nonce
+            'X-WP-Header' : 'nonce'
         }
     })
     .then(response => response.json())
