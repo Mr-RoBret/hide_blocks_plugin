@@ -22,14 +22,13 @@
                 array_push( $block_names_verified, $result ); // echo '<p>' . $matches[0] . ', </p></br>';
             }
         }
-        
+    
         //return array
         return rest_ensure_response( [ 'data' => $block_names_verified ] );
-
     }
 
     function get_permissions_callback() {
-        if ( ! current_user_can( 'manage_options' )){
+        if ( ! current_user_can( 'manage_network_options' ) ) {
             return new WP_Error( 'rest_forbidden ', 
             esc_html__( 'OMG you cannot view private data.', 
             'multisite-settings' ), 

@@ -25,10 +25,8 @@ define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 include( plugin_dir_path( __FILE__ ) . 'get_main_blocks.php' );
 
-// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
-
 $main_blocks_settings_slug = 'blocks-settings-main';
-$main_blocks_allowed_array = [];
+$main_blocks_not_allowed = [];
 
 add_action( 'network_admin_menu', 'add_submenu' );  
 add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'update_network_setting' );
@@ -60,6 +58,7 @@ function add_submenu() {
     // Add a settings field for each one and check to see (in callback) 
     // if checked already in database
     $main_blocks_registry = get_all_blocks();
+    debug_to_console( 'array of currently registered blocks is: ' . $main_blocks_registry );
    
     // callback function for add_settings_field
     function individual_settings_checkbox_callback( $key, $label ) {
@@ -88,11 +87,9 @@ function add_submenu() {
         $checkboxes_field = '';
         if( isset( $option[ 'checkboxes_field' ] ) ) {
             $checkboxes_field = esc_html( $option[ 'checkboxes_field' ] );
-            array_push($GLOBALS[ 'main_blocks_allowed_array' ], $block_name);
+            // array_push($GLOBALS[ 'main_blocks_not_allowed' ], $block_name);
         }
         
-        debug_to_console($GLOBALS[ 'main_blocks_allowed_array' ]);
-
         // create html for current option
         $html = '<input type="checkbox" 
             name="' . $option_name . '[checkboxes_field]" 
@@ -165,23 +162,23 @@ function create_page() {
 function update_network_setting() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
     debug_to_console('Made it to update_network_setting');
-
-    // check_admin_referer( $main_blocks_settings_slug .'-options');
     
-    // get array of checked options in list,
+    // get array of all registered blocks,
     $options_arr = get_all_blocks();
 
+    // loop through array of all registered blocks and update site option with existing value
     foreach($options_arr as $key=>$value) { 
-
         if( isset( $_POST[ 'block_checkbox_' . $value ] ) ) {
             update_site_option( 'block_checkbox_' . $value, $_POST[ 'block_checkbox_' . $value ] );
         } else {
-        update_site_option( 'block_checkbox_' . $value, '');
+            array_push( $GLOBALS[ 'main_blocks_not_allowed' ], $value );
+            update_site_option( 'block_checkbox_' . $value, '');
         } 
     }
     
     // nocache_headers();
 
+    // redirect to settings page w/ 'updated' attribute, to trigger update
     $queryArgs = add_query_arg(
     [
         'page' => $main_blocks_settings_slug,
@@ -195,14 +192,18 @@ function update_network_setting() {
     exit;
 }
 
+// get object of all registered blocks
 function get_all_blocks() {
     $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
-    // $prefix_regex = "/[a-z]+\-?[a-z]+$/";
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
     $block_names = array();
+
+    // place key 'name' into $block_names array,
     foreach( $block_types as $key ) {
         $block_names[] = $key->name;
     }
+
+    // create new array of block names that match the above regex and return
     $block_names_verified = array();
     foreach( $block_names as $name ) {
         $success = preg_match( $test_regex, $name, $match );
@@ -211,8 +212,11 @@ function get_all_blocks() {
             array_push( $block_names_verified, $name ); // echo '<p>' . $matches[0] . ', </p></br>';
         }
     }
+
+
     return $block_names_verified;
 }
+
 
 /**
  * function to retrieve an array from options not selected 
@@ -221,20 +225,25 @@ function get_all_blocks() {
  * @return array
  * 
  */
-function stolaf_allowed_block_types( ) {
-    if( isset( $_GET['BLOCKSDATA' ] ) ) {
-        debug_to_console('$_GET returns: ' . $_GET['BLOCKSDATA']);
-        return $_GET['BLOCKSDATA']['blocks_array'];
-    }
-    // $blocks_to_string = implode( ", ", $allowed_blocks_arr );
+function stolaf_allowed_block_types( $blocks_not_allowed ) {
+    debug_to_console( $blocks_not_allowed );
+    return $blocks_not_allowed;
+
     // return array(
-    //     'core/separator', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns',
+    //     'core/block', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns', 'core/widgets',
     // );
- 
-    // return $response;
 }
 
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
+// add_action( 'plugins_loaded', 'stolaf_allowed_block_types' );
+
+function filter_block_types() {
+    $blocks_not_allowed = $GLOBALS[ 'main_blocks_not_allowed' ];
+    $blocks_not_allowed = implode(  ", ", $blocks_not_allowed );
+    apply_filters( 'allowed_block_types_all', $blocks_not_allowed, 25, 1 );
+}
+
+add_action( 'plugins_loaded', 'filter_block_types' );
 
 /**
  * Simple helper to debug to the console
