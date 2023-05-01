@@ -70,29 +70,27 @@ function add_submenu() {
    
     // callback function for settings field (main site option) 
     function multisite_settings_checkbox_callback() {
+
         $options_name = $GLOBALS[ 'whitelisted_blocks' ];
         $whitelist_options = (get_site_option($options_name));
         $names_arr = [];
 
+        // check to see if whitelist is empty; if not grab listed options
         if( isset( $whitelist_options ) && ! empty( $whitelist_options )) {
             foreach( $whitelist_options as $option_name ) {
-                $option_name_str = $option_name;
                 array_push($names_arr, $option_name);
             }
         }
-        
-        debug_to_console($names_arr);
 
-        // callback function to check if block name is in array
+        // callback function to check off checkboxes for options in whitelist
         function checkName($block_name_wrapped, $whitelist_arr) {
             if (in_array($block_name_wrapped, $whitelist_arr)) {
               return 'checked';
             }
           }
 
-        // callback function for add_settings_option
+        // callback function for add_settings_option; adds html for each block returned from registry
         function individual_settings_checkbox_callback( $registry_block, $names_arr ) {
-            // $whitelist_arr = $names_arr;
 
             $html = '<input type="checkbox" name="block_checkbox_options['.$registry_block.']" 
                 id="block_checkbox_'.$registry_block.'" 
@@ -103,13 +101,11 @@ function add_submenu() {
             echo $html;
         }
 
-        // get list of all registered blocks and add to variable (array)
+        // get list of all registered blocks and add to variable array variable
         $main_blocks_registry = get_all_blocks();
-        debug_to_console( $main_blocks_registry );
 
         // then for each item in array, send to callback functions to add settings field and create html. 
         foreach( $main_blocks_registry as $registry_block ) {
-            // If plugin settings don't exist, create them
             individual_settings_checkbox_callback( $registry_block, $names_arr );   
         }
     }
@@ -165,7 +161,6 @@ function update_network_setting() {
     
     // get site option array and put in variable ($checked_options)
     $database_option = $GLOBALS[ 'whitelisted_blocks' ];
-    //$checked_options = unserialize( get_site_option( $database_option ) );
 
     if( isset( $_POST[ $database_option ] ) ) {
         update_site_option( $database_option, $_POST[ $database_option ] );
@@ -213,16 +208,24 @@ function get_all_blocks() {
 
 /**
  * function to retrieve an array from options not selected 
- * and hide them from the block insterter // Somehow this needs to run ** later ** than it currently runs. 
+ * and hide them from the block insterter 
  * 
  * @return array
  * 
  */
-function stolaf_allowed_block_types($blocks_allowed) {
-    $blocks_allowed = get_site_option( $GLOBALS[ 'whitelisted_blocks' ] );
-    debug_to_console( 'blocks allowed are: ' . $blocks_allowed );
-    debug_to_console( 'type of $blocks_allowed: ' . gettype($blocks_allowed) );
-    return $blocks_allowed;
+function stolaf_allowed_block_types() {
+    
+    $options_name = $GLOBALS[ 'whitelisted_blocks' ];
+        $whitelist_options = (get_site_option($options_name));
+        $names_arr = [];
+
+        if( isset( $whitelist_options ) && ! empty( $whitelist_options )) {
+            foreach( $whitelist_options as $option_name ) {
+                array_push($names_arr, $option_name);
+            }
+        }
+
+    return $names_arr;
 
     // return array(
     //     'core/block', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns', 'core/widgets',
@@ -230,17 +233,6 @@ function stolaf_allowed_block_types($blocks_allowed) {
 }
 
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
-// add_action( 'plugins_loaded', 'stolaf_allowed_block_types' );
-
-// function filter_block_types() {
-//     $database_option = $GLOBALS[ 'whitelisted_blocks' ];
-//     $checked_options = get_site_option( $database_option );
-//     $checked_options = unserialize( $checked_options );
-//     // $blocks_not_allowed = implode(  ", ", $blocks_not_allowed );
-//     apply_filters( 'allowed_block_types_all', $checked_options, 25, 0 );
-// }
-
-// add_action( 'plugins_loaded', 'filter_block_types' );
 
 /**
  * Simple helper to debug to the console
