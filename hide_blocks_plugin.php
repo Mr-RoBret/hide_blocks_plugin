@@ -22,11 +22,11 @@ if ( !defined( 'WPINC' ) ) {
 
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
-include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
-include( plugin_dir_path( __FILE__ ) . 'get_main_blocks.php' );
+// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+// include( plugin_dir_path( __FILE__ ) . 'get_main_blocks.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
-$main_blocks_not_allowed = [];
+$whitelisted_blocks = 'block_checkbox_options';
 
 add_action( 'network_admin_menu', 'add_submenu' );  
 add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'update_network_setting' );
@@ -36,6 +36,10 @@ add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'upd
  */
 function add_submenu() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
+
+    if( false == get_site_option( $GLOBALS[ 'whitelisted_blocks' ] ) ) {
+        add_site_option( $GLOBALS[ 'whitelisted_blocks' ], '' );
+    }
 
     // Create the submenu and register the page creation function.
     add_submenu_page(
@@ -55,66 +59,62 @@ function add_submenu() {
         $main_blocks_settings_slug
     );
 
-    // Add a settings field for each one and check to see (in callback) 
-    // if checked already in database
-    $main_blocks_registry = get_all_blocks();
-    debug_to_console( 'array of currently registered blocks is: ' . $main_blocks_registry );
+    // Add a settings field to house the whitelist array
+    add_settings_field(
+        $GLOBALS[ 'whitelisted_blocks' ],   // id of field
+        __( '', 'multisite-settings' ),         // title of field to display
+        'multisite_settings_checkbox_callback', // callback function
+        $main_blocks_settings_slug,       // page to display it on
+        'main-blocks-section'
+    );
    
-    // callback function for add_settings_field
-    function individual_settings_checkbox_callback( $key, $label ) {
-        $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
-    
-        add_settings_field(
-            'block_checkbox_' . $label,   // id of field
-            __( '', 'multisite-settings' ),         // title of field to display
-            'multisite_settings_checkbox_callback', // callback function
-            $main_blocks_settings_slug,       // page to display it on
-            'main-blocks-section',                  // section on page to display in
-            [   
-                'field_name'=>'block_checkbox_' . $label,
-                'index' => $key,
-                'label' => $label
-            ]
-        );
-    }
-    
-    // callback function to create html for each option and check its status
-    function multisite_settings_checkbox_callback( $args ) {
-        $option = get_site_option( $args['field_name'] );
-        $option_name = $args['field_name'];
-        $block_name = $args['label'];
-    
-        $checkboxes_field = '';
-        if( isset( $option[ 'checkboxes_field' ] ) ) {
-            $checkboxes_field = esc_html( $option[ 'checkboxes_field' ] );
-            // array_push($GLOBALS[ 'main_blocks_not_allowed' ], $block_name);
+    // callback function for settings field (main site option) 
+    function multisite_settings_checkbox_callback() {
+        $options_name = $GLOBALS[ 'whitelisted_blocks' ];
+        $whitelist_options = (get_site_option($options_name));
+        $names_arr = [];
+
+        if( isset( $whitelist_options ) && ! empty( $whitelist_options )) {
+            foreach( $whitelist_options as $option_name ) {
+                $option_name_str = $option_name;
+                array_push($names_arr, $option_name);
+            }
         }
         
-        // create html for current option
-        $html = '<input type="checkbox" 
-            name="' . $option_name . '[checkboxes_field]" 
-            id="block_checkbox_' . $args['label'] . '"
-            "value="on"' . checked( "on", $checkboxes_field, false ) . '/>';
-                
-        $html .= '&nbsp;';
-    
-        $html .= '<label for="block_checkbox_' . $args['label'] . '">' . $args['label'] . '</label>';   
-        
-        echo $html;
-    }
+        debug_to_console($names_arr);
 
-    // loop through every block in registry and add option if no option exists;
-    // then send to callback functions to add settings field and create html. 
-    foreach( $main_blocks_registry as $key=>$value ) {
-        // If plugin settings don't exist, create them
-        if( false == get_site_option( 'block_checkbox_' . $value ) ) {
-            add_site_option( 'block_checkbox_' . $value, '' );
+        // callback function to check if block name is in array
+        function checkName($block_name_wrapped, $whitelist_arr) {
+            if (in_array($block_name_wrapped, $whitelist_arr)) {
+              return 'checked';
+            }
+          }
+
+        // callback function for add_settings_option
+        function individual_settings_checkbox_callback( $registry_block, $names_arr ) {
+            // $whitelist_arr = $names_arr;
+
+            $html = '<input type="checkbox" name="block_checkbox_options['.$registry_block.']" 
+                id="block_checkbox_'.$registry_block.'" 
+                value="'.$registry_block.'"'. checkName($registry_block, $names_arr).'>';
+            $html .= '<label for="block_checkbox_'. $registry_block .'">'.$registry_block.'</label>';
+            $html .= '<br>';
+
+            echo $html;
         }
-        individual_settings_checkbox_callback( $key, $value );
 
-        // register setting for newly created checkbox option
-        register_setting( 'main-blocks-section', 'block_checkbox_' . $value );   
+        // get list of all registered blocks and add to variable (array)
+        $main_blocks_registry = get_all_blocks();
+        debug_to_console( $main_blocks_registry );
+
+        // then for each item in array, send to callback functions to add settings field and create html. 
+        foreach( $main_blocks_registry as $registry_block ) {
+            // If plugin settings don't exist, create them
+            individual_settings_checkbox_callback( $registry_block, $names_arr );   
+        }
     }
+    // register setting for newly created checkbox option
+    register_setting( 'main-blocks-section', $GLOBALS[ 'whitelisted_blocks' ] );
 }
 
 /**
@@ -163,30 +163,26 @@ function update_network_setting() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
     debug_to_console('Made it to update_network_setting');
     
-    // get array of all registered blocks,
-    $options_arr = get_all_blocks();
+    // get site option array and put in variable ($checked_options)
+    $database_option = $GLOBALS[ 'whitelisted_blocks' ];
+    //$checked_options = unserialize( get_site_option( $database_option ) );
 
-    // loop through array of all registered blocks and update site option with existing value
-    foreach($options_arr as $key=>$value) { 
-        if( isset( $_POST[ 'block_checkbox_' . $value ] ) ) {
-            update_site_option( 'block_checkbox_' . $value, $_POST[ 'block_checkbox_' . $value ] );
-        } else {
-            array_push( $GLOBALS[ 'main_blocks_not_allowed' ], $value );
-            update_site_option( 'block_checkbox_' . $value, '');
-        } 
+    if( isset( $_POST[ $database_option ] ) ) {
+        update_site_option( $database_option, $_POST[ $database_option ] );
+    } else {
+        update_site_option( $database_option, '');
     }
     
     // nocache_headers();
 
     // redirect to settings page w/ 'updated' attribute, to trigger update
     $queryArgs = add_query_arg(
-    [
-        'page' => $main_blocks_settings_slug,
-        'updated' => true,
-    ],
-    network_admin_url( 'settings.php' )
+        [
+            'page' => $main_blocks_settings_slug,
+            'updated' => true,
+        ],
+        network_admin_url( 'settings.php' )
     );
-
     wp_safe_redirect($queryArgs);
 
     exit;
@@ -212,11 +208,8 @@ function get_all_blocks() {
             array_push( $block_names_verified, $name ); // echo '<p>' . $matches[0] . ', </p></br>';
         }
     }
-
-
     return $block_names_verified;
 }
-
 
 /**
  * function to retrieve an array from options not selected 
@@ -225,9 +218,11 @@ function get_all_blocks() {
  * @return array
  * 
  */
-function stolaf_allowed_block_types( $blocks_not_allowed ) {
-    debug_to_console( $blocks_not_allowed );
-    return $blocks_not_allowed;
+function stolaf_allowed_block_types($blocks_allowed) {
+    $blocks_allowed = get_site_option( $GLOBALS[ 'whitelisted_blocks' ] );
+    debug_to_console( 'blocks allowed are: ' . $blocks_allowed );
+    debug_to_console( 'type of $blocks_allowed: ' . gettype($blocks_allowed) );
+    return $blocks_allowed;
 
     // return array(
     //     'core/block', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns', 'core/widgets',
@@ -237,13 +232,15 @@ function stolaf_allowed_block_types( $blocks_not_allowed ) {
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
 // add_action( 'plugins_loaded', 'stolaf_allowed_block_types' );
 
-function filter_block_types() {
-    $blocks_not_allowed = $GLOBALS[ 'main_blocks_not_allowed' ];
-    $blocks_not_allowed = implode(  ", ", $blocks_not_allowed );
-    apply_filters( 'allowed_block_types_all', $blocks_not_allowed, 25, 1 );
-}
+// function filter_block_types() {
+//     $database_option = $GLOBALS[ 'whitelisted_blocks' ];
+//     $checked_options = get_site_option( $database_option );
+//     $checked_options = unserialize( $checked_options );
+//     // $blocks_not_allowed = implode(  ", ", $blocks_not_allowed );
+//     apply_filters( 'allowed_block_types_all', $checked_options, 25, 0 );
+// }
 
-add_action( 'plugins_loaded', 'filter_block_types' );
+// add_action( 'plugins_loaded', 'filter_block_types' );
 
 /**
  * Simple helper to debug to the console
