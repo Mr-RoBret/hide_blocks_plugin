@@ -4,7 +4,7 @@ function plugin_scripts() {
     
     wp_enqueue_script(
         'get_variation_blocks',
-        HIDEBLOCKS_URL . 'js/get_variation_blocks.js',
+        HIDEBLOCKS_URL . 'js/hide_variation_blocks.js',
         array( 'jquery', 'wp-blocks', 'wp-dom', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
         '1.0.0',
         true

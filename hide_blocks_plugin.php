@@ -23,7 +23,7 @@ if ( !defined( 'WPINC' ) ) {
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
-include( plugin_dir_path( __FILE__ ) . 'return_variations.php' );
+include( plugin_dir_path( __FILE__ ) . 'get_variation_blocks.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
 $block_variations_settings_slug = 'blocks_settings-variation';
@@ -150,7 +150,7 @@ function add_instructions() {
  * ************** VARIATION CODE BEGIN **************** *
  */
 function multisite_settings_variations_callback() {
-
+    debug_to_console('We are at multisite_settings_variations_callback.');
     $variations_name = $GLOBALS[ 'whitelisted_variations' ];
     $variations_options = (get_site_option($variations_name));
     $variations_arr = [];
@@ -182,9 +182,9 @@ function multisite_settings_variations_callback() {
         echo $html;
     }
 
-    // get list of all registered blocks and add to variable array variable
+    // get list of all registered variation blocks and add to array variable
     $variation_blocks_registry = get_all_variation_blocks();
-    debug_to_console($variation_blocks_registry);
+    // debug_to_console($variation_blocks_registry);
 
     // then for each item in array, send to callback functions to add settings field and create html. 
     foreach( $variation_blocks_registry as $registry_block ) {
@@ -206,12 +206,9 @@ esc_html_e( 'Please check the block variations you would like visible in the Blo
 }
 
 function get_all_variation_blocks() {
-    // $variations_returned = ['embed/youtube', 'embed/twitter'];
-    if( isset( $_POST[ 'variations_arr' ] ) ) {
-        $variations_returned = $_POST['variations_arr'];
-        debug_to_console($variations_returned);
-        return $variations_returned;
-    }  
+    $all_variations = ['embed/twitter', 'embed/youtube', 'embed/instagram', 'embed/wordpress', 'embed/soundcloud', 'embed/spotify', 'ebmed/embed/flickr', 'ebmed/vimeo', 'ebmed/animoto', 'ebmed/cloudup', 'ebmed/collegehumor', 'ebmed/crowdsignal', 'ebmed/dailymotion', 'ebmed/imgur', 'ebmed/issuu', 'ebmed/kickstarter', 'ebmed/mixcloud', 'ebmed/pocketcasts', 'embed/reddit', 'embed/reverbnation', 'embed/screencast', 'embed/scribd', 'embed/slideshare', 'embed/smugmug', 'embed/speaker-deck', 'embed/tiktok', 'embed/ted', 'embed/tumblr', 'embed/videopress', 'embed/wordpress-tv', 'embed/amazon-kindle', 'embed/pinterest', 'embed/wolfram-cloud', 'embed/facebook', 'embed/loom', 'embed/smartframe', 'embed/descript'];
+    // debug_to_console($all_variations);
+    return $all_variations; 
 }
 
 /**
@@ -321,24 +318,47 @@ function get_all_blocks() {
  */
 function stolaf_allowed_block_types() {
     
+    // get whitelist array from main blocks settings
     $options_name = $GLOBALS[ 'whitelisted_blocks' ];
-        $whitelist_options = (get_site_option($options_name));
-        $names_arr = [];
-
-        if( isset( $whitelist_options ) && ! empty( $whitelist_options )) {
-            foreach( $whitelist_options as $option_name ) {
-                array_push($names_arr, $option_name);
-            }
+    $whitelist_options = (get_site_option($options_name));
+    $final_whitelist_array = [];
+    
+    if( isset( $whitelist_options ) && ! empty( $whitelist_options )) {
+        foreach( $whitelist_options as $option_name ) {
+            array_push($final_whitelist_array, $option_name);
         }
+    }
+    
+    // get whitelist array from variations blocks settings
+    $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
+    $whitelist_variations = (get_site_option($var_options_name));
 
-    return $names_arr;
+    if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
+        foreach( $whitelist_variations as $option_name ) {
+            array_push($final_whitelist_array, $option_name);
+        }
+    }
 
-    // return array(
-    //     'core/block', 'core/social-links', 'core/spacer', 'core/table', 'core/text-columns', 'core/widgets',
-    // );
+    debug_to_console($final_whitelist_array);
+    return $final_whitelist_array;
 }
 
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
+
+function stolaf_allowed_variations() {
+    $vars_name = $GLOBALS[ 'whitelisted_variations' ];
+    $whitelist_vars = get_site_option($vars_name);
+    $whitelist_vars_names = [];
+
+    if( isset( $whitelist_vars ) && ! empty( $whitelist_vars )) {
+        foreach( $whitelist_vars as $variation_name ) {
+            array_push($whitelist_vars_names, $variation_name);
+        }
+    }
+
+    return $whitelist_vars_names;
+
+}
 
 /**
  * Simple helper to debug to the console
