@@ -22,11 +22,13 @@ if ( !defined( 'WPINC' ) ) {
 
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
-// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
-// include( plugin_dir_path( __FILE__ ) . 'get_main_blocks.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+include( plugin_dir_path( __FILE__ ) . 'return_variations.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
+$block_variations_settings_slug = 'blocks_settings-variation';
 $whitelisted_blocks = 'block_checkbox_options';
+$whitelisted_variations = 'variation_checkbox_options';
 
 add_action( 'network_admin_menu', 'add_submenu' );  
 add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'update_network_setting' );
@@ -36,9 +38,13 @@ add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'upd
  */
 function add_submenu() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
+    $block_variations_settings_slug = $GLOBALS[ 'block_variations_settings_slug' ];
 
     if( false == get_site_option( $GLOBALS[ 'whitelisted_blocks' ] ) ) {
         add_site_option( $GLOBALS[ 'whitelisted_blocks' ], '' );
+    }
+    if( false == get_site_option( $GLOBALS[ 'whitelisted_variations' ] ) ) {
+        add_site_option( $GLOBALS[ 'whitelisted_variations' ], '' );
     }
 
     // Create the submenu and register the page creation function.
@@ -59,6 +65,14 @@ function add_submenu() {
         $main_blocks_settings_slug
     );
 
+    // Register a new section on the page.
+    add_settings_section(
+        'variation-blocks-section',
+        __( 'Variations to Display in Block Inserter', 'multisite-settings' ),
+        'add_variation_instructions',
+        $main_blocks_settings_slug
+    );
+
     // Add a settings field to house the whitelist array
     add_settings_field(
         $GLOBALS[ 'whitelisted_blocks' ],   // id of field
@@ -68,6 +82,15 @@ function add_submenu() {
         'main-blocks-section'
     );
    
+    // Add a settings field to house the whitelist array
+    add_settings_field(
+        $GLOBALS[ 'whitelisted_variations' ],   // id of field
+        __( '', 'multisite-settings' ),         // title of field to display
+        'multisite_settings_variations_callback', // callback function
+        $main_blocks_settings_slug,       // page to display it on
+        'variation-blocks-section'
+    );
+
     // callback function for settings field (main site option) 
     function multisite_settings_checkbox_callback() {
 
@@ -111,6 +134,7 @@ function add_submenu() {
     }
     // register setting for newly created checkbox option
     register_setting( 'main-blocks-section', $GLOBALS[ 'whitelisted_blocks' ] );
+    
 }
 
 /**
@@ -123,10 +147,84 @@ function add_instructions() {
 }
 
 /**
+ * ************** VARIATION CODE BEGIN **************** *
+ */
+function multisite_settings_variations_callback() {
+
+    $variations_name = $GLOBALS[ 'whitelisted_variations' ];
+    $variations_options = (get_site_option($variations_name));
+    $variations_arr = [];
+    // console_debug($variations_name);
+
+    // check to see if whitelist is empty; if not grab listed options
+    if( isset( $variations_options ) && ! empty( $variations_options )) {
+        foreach( $variations_options as $var_name ) {
+            array_push($variations_arr, $var_name);
+        }
+    }
+
+    // callback function to check off checkboxes for options in whitelist
+    function checkVariationName($block_name_wrapped, $whitelist_arr) {
+        if (in_array($block_name_wrapped, $whitelist_arr)) {
+          return 'checked';
+        }
+      }
+
+    // callback function for add_settings_option; adds html for each block returned from registry
+    function individual_variations_checkbox_callback( $registry_block, $variations_arr ) {
+
+        $html = '<input type="checkbox" name="variation_checkbox_options['.$registry_block.']" 
+            id="variation_checkbox_'.$registry_block.'" 
+            value="'.$registry_block.'"'. checkVariationName($registry_block, $variations_arr).'>';
+        $html .= '<label for="variation_checkbox_'. $registry_block .'">'.$registry_block.'</label>';
+        $html .= '<br>';
+
+        echo $html;
+    }
+
+    // get list of all registered blocks and add to variable array variable
+    $variation_blocks_registry = get_all_variation_blocks();
+    debug_to_console($variation_blocks_registry);
+
+    // then for each item in array, send to callback functions to add settings field and create html. 
+    foreach( $variation_blocks_registry as $registry_block ) {
+        debug_to_console($registry_block);
+        individual_variations_checkbox_callback( $registry_block, $variations_arr );   
+    }
+    // register setting for newly created checkbox option
+    register_setting( 'variation-blocks-section', $GLOBALS[ 'whitelisted_variations' ] );
+}
+
+
+/**
+* Html after the new section title.
+*
+* @return void
+*/
+function add_variation_instructions() {
+esc_html_e( 'Please check the block variations you would like visible in the Block Inserter.', 'multisite-settings' );
+}
+
+function get_all_variation_blocks() {
+    // $variations_returned = ['embed/youtube', 'embed/twitter'];
+    if( isset( $_POST[ 'variations_arr' ] ) ) {
+        $variations_returned = $_POST['variations_arr'];
+        debug_to_console($variations_returned);
+        return $variations_returned;
+    }  
+}
+
+/**
+ * ************** VARIATION CODE END **************** *
+ */
+
+
+/**
  * This creates the settings page itself.
  */
 function create_page() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
+    $block_variations_settings_slug = $GLOBALS[ 'block_variations_settings_slug' ];
     ?>
     <?php if ( isset( $_GET['updated'] ) ) : ?>
         <div id="message" class="updated notice is-dismissible">
@@ -138,8 +236,8 @@ function create_page() {
 
             <form method="post" action="<?php echo add_query_arg( 'action', $main_blocks_settings_slug . '-update', 'edit.php' ) ?>">
                 <?php
-                    settings_fields( 'main-blocks-section' );
-                    do_settings_sections( $main_blocks_settings_slug );
+                    settings_fields( 'main-blocks-section', 'variation-blocks-section' );
+                    do_settings_sections( $main_blocks_settings_slug, $block_variations_settings_slug );
                     submit_button();
                 ?>
             </form>
@@ -157,18 +255,26 @@ function create_page() {
  */
 function update_network_setting() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
-    debug_to_console('Made it to update_network_setting');
     
-    // get site option array and put in variable ($checked_options)
+    // get global names
     $database_option = $GLOBALS[ 'whitelisted_blocks' ];
+    $variation_option = $GLOBALS[ 'whitelisted_variations' ];
 
+    // update main options
     if( isset( $_POST[ $database_option ] ) ) {
         update_site_option( $database_option, $_POST[ $database_option ] );
     } else {
         update_site_option( $database_option, '');
     }
+
+    // update variation options
+    if( isset( $_POST[ $variation_option ] ) ) {
+        update_site_option( $variation_option, $_POST[ $variation_option ] );
+    } else {
+        update_site_option( $variation_option, '');
+    }
     
-    // nocache_headers();
+    nocache_headers();
 
     // redirect to settings page w/ 'updated' attribute, to trigger update
     $queryArgs = add_query_arg(
