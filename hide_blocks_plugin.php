@@ -188,7 +188,7 @@ function multisite_settings_variations_callback() {
 
     // then for each item in array, send to callback functions to add settings field and create html. 
     foreach( $variation_blocks_registry as $registry_block ) {
-        debug_to_console($registry_block);
+        // debug_to_console($registry_block);
         individual_variations_checkbox_callback( $registry_block, $variations_arr );   
     }
     // register setting for newly created checkbox option
@@ -205,10 +205,20 @@ function add_variation_instructions() {
 esc_html_e( 'Please check the block variations you would like visible in the Block Inserter.', 'multisite-settings' );
 }
 
+function variations_rest_get_request( $route ) {
+    $request = new WP_REST_Request( 'GET', $route );
+    // $request->set_query_params( $params );
+    $response = rest_do_request( $request ); // get only one array from response here...
+
+    return rest_get_server()->response_to_data( $response, false );
+}
+
 function get_all_variation_blocks() {
-    $all_variations = ['embed/twitter', 'embed/youtube', 'embed/instagram', 'embed/wordpress', 'embed/soundcloud', 'embed/spotify', 'ebmed/embed/flickr', 'ebmed/vimeo', 'ebmed/animoto', 'ebmed/cloudup', 'ebmed/collegehumor', 'ebmed/crowdsignal', 'ebmed/dailymotion', 'ebmed/imgur', 'ebmed/issuu', 'ebmed/kickstarter', 'ebmed/mixcloud', 'ebmed/pocketcasts', 'embed/reddit', 'embed/reverbnation', 'embed/screencast', 'embed/scribd', 'embed/slideshare', 'embed/smugmug', 'embed/speaker-deck', 'embed/tiktok', 'embed/ted', 'embed/tumblr', 'embed/videopress', 'embed/wordpress-tv', 'embed/amazon-kindle', 'embed/pinterest', 'embed/wolfram-cloud', 'embed/facebook', 'embed/loom', 'embed/smartframe', 'embed/descript'];
-    // debug_to_console($all_variations);
-    return $all_variations; 
+    $route = '/blocks-settings-main/v1/main-blocks';
+    $request = variations_rest_get_request( $route );
+    $variations_all = $request['all_variations'];
+    return $variations_all;
+
 }
 
 /**
@@ -328,8 +338,7 @@ function stolaf_allowed_block_types() {
             array_push($final_whitelist_array, $option_name);
         }
     }
-    
-    // get whitelist array from variations blocks settings
+
     $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
     $whitelist_variations = (get_site_option($var_options_name));
 
@@ -337,28 +346,14 @@ function stolaf_allowed_block_types() {
         foreach( $whitelist_variations as $option_name ) {
             array_push($final_whitelist_array, $option_name);
         }
-    }
+    } 
 
     debug_to_console($final_whitelist_array);
     return $final_whitelist_array;
 }
 
-add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' );
+add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' ); // run this later than it is running?
 
-function stolaf_allowed_variations() {
-    $vars_name = $GLOBALS[ 'whitelisted_variations' ];
-    $whitelist_vars = get_site_option($vars_name);
-    $whitelist_vars_names = [];
-
-    if( isset( $whitelist_vars ) && ! empty( $whitelist_vars )) {
-        foreach( $whitelist_vars as $variation_name ) {
-            array_push($whitelist_vars_names, $variation_name);
-        }
-    }
-
-    return $whitelist_vars_names;
-
-}
 
 /**
  * Simple helper to debug to the console
