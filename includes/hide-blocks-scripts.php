@@ -7,9 +7,6 @@ function plugin_scripts() {
     if( !function_exists( 'get_current_screen' ) ) {
         require_once(ABSPATH . 'wp-admin/includes/screen.php');
     } 
-        $current_screen = get_current_screen();
-        // var_dump($current_screen);
-        // var_dump(get_current_screen()->id);
 
         if( get_current_screen()->id == 'page' ) {
             // var_dump($current_screen);
@@ -20,7 +17,6 @@ function plugin_scripts() {
             array_push($dependencies, 'wp-edit-post');
         }
     
-
     wp_enqueue_script(
         'hide_variation_blocks', 
         HIDEBLOCKS_URL . 'js/hide_variation_blocks.js', __FILE__ , 
@@ -31,5 +27,21 @@ function plugin_scripts() {
 }
 
 add_action( 'enqueue_block_editor_assets', 'plugin_scripts' );
+
+
+function inserter_scripts() {
+        
+    $inserter_dependencies = array( 'jquery', 'wp-blocks', 'wp-dom-ready' );
+        
+    wp_enqueue_script(
+        'get_show_in_inserter', 
+        HIDEBLOCKS_URL . 'js/get_show_in_inserter.js', __FILE__ , 
+        $inserter_dependencies, 
+        1, 
+        false 
+        );
+    }
+
+add_action( 'enqueue_block_editor_assets', 'inserter_scripts' )
 
 ?>

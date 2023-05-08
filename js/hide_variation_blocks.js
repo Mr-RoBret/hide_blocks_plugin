@@ -26,7 +26,7 @@
                     // console.log(block_var);
                 });
 
-                console.log("Success:", result);
+                // console.log("Success:", result);
                 return result;
                 
             } catch (error) {

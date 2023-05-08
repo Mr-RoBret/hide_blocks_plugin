@@ -38,7 +38,7 @@ add_action( 'network_admin_edit_' . $main_blocks_settings_slug . '-update', 'upd
  */
 function add_submenu() {
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
-    $block_variations_settings_slug = $GLOBALS[ 'block_variations_settings_slug' ];
+    // $block_variations_settings_slug = $GLOBALS[ 'block_variations_settings_slug' ];
 
     if( false == get_site_option( $GLOBALS[ 'whitelisted_blocks' ] ) ) {
         add_site_option( $GLOBALS[ 'whitelisted_blocks' ], '' );
@@ -126,6 +126,7 @@ function add_submenu() {
 
         // get list of all registered blocks and add to variable array variable
         $main_blocks_registry = get_all_blocks();
+        sort($main_blocks_registry);
 
         // then for each item in array, send to callback functions to add settings field and create html. 
         foreach( $main_blocks_registry as $registry_block ) {
@@ -184,6 +185,7 @@ function multisite_settings_variations_callback() {
 
     // get list of all registered variation blocks and add to array variable
     $variation_blocks_registry = get_all_variation_blocks();
+    sort($variation_blocks_registry);
     // debug_to_console($variation_blocks_registry);
 
     // then for each item in array, send to callback functions to add settings field and create html. 
@@ -300,13 +302,23 @@ function update_network_setting() {
 function get_all_blocks() {
     $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+
     $block_names = array();
 
-    // place key 'name' into $block_names array,
-    foreach( $block_types as $key ) {
-        $block_names[] = $key->name;
+    function test_for_parent( $block_object ) {
+        if( null == $block_object->parent ) {
+            return true;
+        }
     }
 
+    foreach( $block_types as $block ) {
+        // debug_to_console( $block );
+
+        if( test_for_parent( $block ) ) {
+            $block_names[] = $block->name;
+        }
+    }
+    
     // create new array of block names that match the above regex and return
     $block_names_verified = array();
     foreach( $block_names as $name ) {
@@ -338,43 +350,10 @@ function stolaf_allowed_block_types() {
             array_push($final_whitelist_array, $option_name);
         }
     }
-
-    // $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
-    // $whitelist_variations = (get_site_option($var_options_name));
-
-    // if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
-    //     foreach( $whitelist_variations as $option_name ) {
-    //         array_push($final_whitelist_array, $option_name);
-    //     }
-    // } 
-
-    // debug_to_console($final_whitelist_array);
     return $final_whitelist_array;
 }
 
-add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' ); // run this later than it is running?
-
-
-// function stolaf_allowed_variations() {
-//     wp_enqueue_script(
-//         'hide_variation_blocks',
-//         HIDEBLOCKS_URL . 'js/hide_variation_blocks.js',
-//         array( 'jquery', 'wp-blocks', 'wp-dom', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
-//         '1.0.0',
-//         true
-//     );
-
-//     // $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
-//     // $whitelist_variations = (get_site_option($var_options_name));
-
-//     // if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
-//     //     foreach( $whitelist_variations as $option_name ) {
-//     //         array_push($final_whitelist_array, $option_name);
-//     //     }
-//     // } 
-// }
-
-// add_action( '', 'stolaf_allowed_variations' );
+add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' ); 
 
 /**
  * Simple helper to debug to the console
