@@ -150,7 +150,7 @@ function add_instructions() {
  * ************** VARIATION CODE BEGIN **************** *
  */
 function multisite_settings_variations_callback() {
-    debug_to_console('We are at multisite_settings_variations_callback.');
+    // debug_to_console('We are at multisite_settings_variations_callback.');
     $variations_name = $GLOBALS[ 'whitelisted_variations' ];
     $variations_options = (get_site_option($variations_name));
     $variations_arr = [];
@@ -339,21 +339,42 @@ function stolaf_allowed_block_types() {
         }
     }
 
-    $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
-    $whitelist_variations = (get_site_option($var_options_name));
+    // $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
+    // $whitelist_variations = (get_site_option($var_options_name));
 
-    if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
-        foreach( $whitelist_variations as $option_name ) {
-            array_push($final_whitelist_array, $option_name);
-        }
-    } 
+    // if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
+    //     foreach( $whitelist_variations as $option_name ) {
+    //         array_push($final_whitelist_array, $option_name);
+    //     }
+    // } 
 
-    debug_to_console($final_whitelist_array);
+    // debug_to_console($final_whitelist_array);
     return $final_whitelist_array;
 }
 
 add_filter( 'allowed_block_types_all', 'stolaf_allowed_block_types' ); // run this later than it is running?
 
+
+// function stolaf_allowed_variations() {
+//     wp_enqueue_script(
+//         'hide_variation_blocks',
+//         HIDEBLOCKS_URL . 'js/hide_variation_blocks.js',
+//         array( 'jquery', 'wp-blocks', 'wp-dom', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-edit-post' ),
+//         '1.0.0',
+//         true
+//     );
+
+//     // $var_options_name = $GLOBALS[ 'whitelisted_variations' ];
+//     // $whitelist_variations = (get_site_option($var_options_name));
+
+//     // if( isset( $whitelist_variations ) && ! empty( $whitelist_variations )) {
+//     //     foreach( $whitelist_variations as $option_name ) {
+//     //         array_push($final_whitelist_array, $option_name);
+//     //     }
+//     // } 
+// }
+
+// add_action( '', 'stolaf_allowed_variations' );
 
 /**
  * Simple helper to debug to the console

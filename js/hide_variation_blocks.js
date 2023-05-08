@@ -1,9 +1,7 @@
-window.addEventListener('DOMContentLoaded', function () {
 
+// window.addEventListener('DOMContentLoaded', function () {
     wp.domReady(function () {
-        
         async function getVariations() {
-
             try {
                 const response = await fetch( '/index.php/wp-json/blocks-settings-main/v1/main-blocks', {
                 method: 'GET',
@@ -17,18 +15,15 @@ window.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
 
                 const all_array = Object.values(result['all_variations']);
-                // console.log(all_array);
                 const allowed_array = Object.values(result['allowed_variations']);
-                // console.log(allowed_array);
-
+                
                 all_array.forEach((block_var) => {
-
                     //  if item doesn't exist in allowed blocks array, unregister from blocks 
                     if(!allowed_array.includes(block_var)) {
                         // console.log('not allowed, mr. ' + block_var + '!');
-                        wp.blocks.unregisterBlockType(block_var);
+                        wp.blocks.unregisterBlockVariation(block_var);
                     }
-                    console.log(block_var);
+                    // console.log(block_var);
                 });
 
                 console.log("Success:", result);
@@ -38,12 +33,8 @@ window.addEventListener('DOMContentLoaded', function () {
                 console.error("Error:", error);
             }
         }
-
         const variations_all = getVariations();
-        
         return variations_all;
-
     });
-
-})
+// })
 
