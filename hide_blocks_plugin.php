@@ -2,7 +2,7 @@
 /*
 Plugin Name: Hide Blocks Plugin
 Description: Populates list of blocks with toggles for turning on & off in block selector
-Version: 1.0.0
+Version: 0.1.1
 Contributors: bfarley01
 Author: Bret Farley
 License: GPLv2 or later
