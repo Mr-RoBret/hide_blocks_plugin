@@ -23,6 +23,7 @@ if ( !defined( 'WPINC' ) ) {
 define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 include( plugin_dir_path( __FILE__ ) . 'get_variation_blocks.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';

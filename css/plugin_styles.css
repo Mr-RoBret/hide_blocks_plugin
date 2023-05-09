@@ -1,0 +1,11 @@
+.form-table td {
+    display: flex;
+    flex-direction: column;
+    max-height: 75vh;
+    flex-wrap: wrap;
+    max-width: 75vw;
+}
+
+.form-table th {
+    width: 0px;
+}
