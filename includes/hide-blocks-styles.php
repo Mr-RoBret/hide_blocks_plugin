@@ -1,19 +1,19 @@
 <?php
-    // load CSS on Blocks Plugin page
-    function hide_blocks_styles( $hook ) {
+    function hide_blocks_admin_styles( $hook_suffix ) {
+        
+        if( 'blocks-settings-main' !== $hook_suffix ) {
+            return;
+        }
 
         wp_register_style(
-            'hide_blocks_admin',
-            HIDEBLOCKS_URL . 'includes/hide-blocks-styles.php',
-            [],
-            time()
+            'blocks-settings-main',
+            HIDEBLOCKS_URL . 'css/plugin_styles.css', __FILE__ , 
+            [], 
+            '1.0.0'
         );
-
-        if ( 'toplevel_page_hide-blocks' == $hook ) {
-            print_r('css should load');
-            wp_enqueue_style( 'hide_blocks_admin' );
-        }
+        wp_enqueue_style( 'blocks-settings-main' );
     }
 
-    add_action( 'wp_loaded', 'hide_blocks_styles', 120 );
+    add_action( 'admin_enqueue_scripts', 'hide_blocks_admin_styles' );
+
 ?>
