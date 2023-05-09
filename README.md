@@ -4,6 +4,4 @@
 
 **Author:** Bret Farley 
 
-The purpose of this plugin is to allow a WordPress Administrator to create a list of blocks they wish to hide from the Block Selector menu. The list, entered into a settings field and separated by commas, will be converted into an array once submitted, and any name in the array that matches the list of blocks retrieved from the frontend (once all core blocks and plugin-based blocks can be found via the **Blocks API**) will be unregistered. 
-
-Later, a separate settings field for Embed blocks will allow only certain Embed blocks to be registered and displayed in the Block Selector. 
+The purpose of this plugin is to allow a WordPress Administrator to select which blocks they wish to show in the Block Inserter, across every site in the network. Two sets of checkboxes will control this: one from the list of parent blocks loaded in PHP, and the other from the list of variation blocks generated in JavaScript once the Edit View loads.  
