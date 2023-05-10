@@ -127,10 +127,11 @@ function add_submenu() {
 
         // get list of all registered blocks and add to variable array variable
         $main_blocks_registry = get_all_blocks();
-        sort($main_blocks_registry);
+        $unique_blocks_registry = array_unique($main_blocks_registry);
+        sort($unique_blocks_registry);
 
         // then for each item in array, send to callback functions to add settings field and create html. 
-        foreach( $main_blocks_registry as $registry_block ) {
+        foreach( $unique_blocks_registry as $registry_block ) {
             individual_settings_checkbox_callback( $registry_block, $names_arr );   
         }
     }
@@ -351,7 +352,7 @@ function get_all_blocks() {
             array_push( $block_names_verified, $name ); // echo '<p>'
         }
     }
-    debug_to_console($block_names_verified);
+    // debug_to_console($block_names_verified);
     return $block_names_verified;
 }
 
