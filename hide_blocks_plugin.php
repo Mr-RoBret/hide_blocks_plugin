@@ -301,11 +301,32 @@ function update_network_setting() {
 
 // get object of all registered blocks
 function get_all_blocks() {
-    $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
+    // $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
+    $test_regex = "/[a-z]+\/([a-z]+-?){1,}$/";
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
-    $acf_block_types = acf_get_block_types();
 
-    $block_names = array();
+    $block_names = array(
+        'acf/st-olaf-accordion', 
+        'acf/st-olaf-events', 
+        'acf/st-olaf-events-main-site', 
+        'acf/st-olaf-explore', 
+        'acf/st-olaf-faculty-staff', 
+        'acf/st-olaf-get-to-know', 
+        'acf/st-olaf-hero', 
+        'acf/st-olaf-image-overlay', 
+        'acf/st-olaf-imagetext', 
+        'acf/st-olaf-masonry-gallery', 
+        'acf/st-olaf-micronavbutton', 
+        'acf/st-olaf-query-loop-main-site', 
+        'acf/st-olaf-query-loop-main-site',
+        'acf/st-olaf-query-loop', 
+        'acf/st-olaf-social', 
+        'acf/st-olaf-tabs', 
+        'acf/st-olaf-title', 
+        'acf/st-olaf-video', 
+        'acf/st-olaf-wysiwyg', 
+        'acf/st-olaf-youtube'
+    );
 
     function test_for_parent( $block_object ) {
         if( null == $block_object->parent ) {
@@ -317,21 +338,21 @@ function get_all_blocks() {
         // debug_to_console( $block );
 
         if( test_for_parent( $block ) ) {
-            $block_names[] = $block->name;
+            // $block_names[] = $block->name;
+            array_push($block_names, $block->name);
         }
     }
-
-    foreach( $acf_block_types as $acf_block ) {
-        $block_names[] = $acf_block->name;
-    }
     
+    // debug_to_console($block_names);
+
     // create new array of block names that match the above regex and return
     $block_names_verified = array();
     foreach( $block_names as $name ) {
-        $success = preg_match( $test_regex, $name, $match );
+        
+        $success = preg_match( $test_regex, $name, $match, false );
         if( $success ) {
-            // preg_match( $prefix_regex, $name, $matches );
-            array_push( $block_names_verified, $name ); // echo '<p>' . $matches[0] . ', </p></br>';
+            // debug_to_console($name);
+            array_push( $block_names_verified, $name ); // echo '<p>'
         }
     }
     return $block_names_verified;
