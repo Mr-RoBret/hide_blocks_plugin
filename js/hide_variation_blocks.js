@@ -1,5 +1,5 @@
 
-// window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('DOMContentLoaded', function () {
     wp.domReady(function () {
         async function getVariations() {
             try {
@@ -36,5 +36,5 @@
         const variations_all = getVariations();
         return variations_all;
     });
-// })
+})
 

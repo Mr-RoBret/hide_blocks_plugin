@@ -1,6 +1,6 @@
 
 window.addEventListener('DOMContentLoaded', function () {
-    // wp.domReady(function () {
+    wp.domReady(function () {
         async function getInserterList() {
 
             try {
@@ -17,6 +17,6 @@ window.addEventListener('DOMContentLoaded', function () {
         const variations_all = getInserterList();
         // console.log(variations_all);
         return variations_all;
-    // });
+    });
 })
 

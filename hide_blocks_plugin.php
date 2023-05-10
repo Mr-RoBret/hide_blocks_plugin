@@ -303,6 +303,7 @@ function update_network_setting() {
 function get_all_blocks() {
     $test_regex = "/[a-z]+\/[a-z]+-?[a-z]+$/";
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+    $acf_block_types = acf_get_block_types();
 
     $block_names = array();
 
@@ -318,6 +319,10 @@ function get_all_blocks() {
         if( test_for_parent( $block ) ) {
             $block_names[] = $block->name;
         }
+    }
+
+    foreach( $acf_block_types as $acf_block ) {
+        $block_names[] = $acf_block->name;
     }
     
     // create new array of block names that match the above regex and return
