@@ -305,6 +305,7 @@ function get_all_blocks() {
     $test_regex = "/[a-z]+\/([a-z]+-?){1,}$/";
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
+    $block_names_verified = array();
     $block_names = array(
         'acf/st-olaf-accordion', 
         'acf/st-olaf-events', 
@@ -335,26 +336,22 @@ function get_all_blocks() {
     }
 
     foreach( $block_types as $block ) {
-        // debug_to_console( $block );
 
         if( test_for_parent( $block ) ) {
-            // $block_names[] = $block->name;
-            array_push($block_names, $block->name);
+            // array_push($block_names, $block->name);
+            $block_names[] = $block->name;
         }
     }
     
-    // debug_to_console($block_names);
-
     // create new array of block names that match the above regex and return
-    $block_names_verified = array();
     foreach( $block_names as $name ) {
         
         $success = preg_match( $test_regex, $name, $match, false );
         if( $success ) {
-            // debug_to_console($name);
             array_push( $block_names_verified, $name ); // echo '<p>'
         }
     }
+    debug_to_console($block_names_verified);
     return $block_names_verified;
 }
 
