@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Hide Blocks Plugin
-Description: Populates list of blocks with toggles for turning on & off in block selector
-Version: 0.1.3
+Description: Provides the list of all registered blocks, including Embed Block variations, with toggles for turning on & off in Block Inserter
+Version: 0.1.5
 Contributors: bfarley01
 Author: Bret Farley
 License: GPLv2 or later
