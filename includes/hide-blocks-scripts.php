@@ -5,7 +5,6 @@
         global $pagenow;
         
         if ( is_admin() && $pagenow === 'post.php' ) {
-            write_to_console($pagenow);
 
             wp_enqueue_script( 
                 'hide_variation_blocks', 

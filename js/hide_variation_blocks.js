@@ -1,6 +1,5 @@
 
 async function getVariations() {
-    console.log("in async function");
     try {
         const response = await fetch( '/index.php/wp-json/blocks-settings-main/v1/main-blocks', {
         method: 'GET',
@@ -12,17 +11,15 @@ async function getVariations() {
         }
     });
     const result = await response.json();
-        console.log(result);
+        // console.log(result);
         const all_array = Object.values(result['all_variations']);
         const allowed_array = Object.values(result['allowed_variations']);
 
         all_array.forEach((block_var) => {
             //  if item doesn't exist in allowed blocks array, unregister from blocks 
             if(!allowed_array.includes(block_var)) {
-                // get parent block (in function above)
                 block_var_name = block_var.split('/');
                 block_name = block_var_name[block_var_name.length - 1];
-                console.log('not allowed, mr. ' + block_name + '!');
                 wp.blocks.unregisterBlockVariation('core/embed', block_name);
             }
         });
