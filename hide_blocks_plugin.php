@@ -24,6 +24,7 @@ define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 include( plugin_dir_path( __FILE__ ) . 'includes/get_variation_blocks.php' );
+include( plugin_dir_path( __FILE__ ) . 'includes/get_all_variation_blocks.php' );
 // include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
@@ -218,7 +219,7 @@ function variations_rest_get_request( $route ) {
 }
 
 function get_all_variation_blocks() {
-    $route = '/blocks-settings-main/v1/main-blocks';
+    $route = '/blocks-settings-main/v1/variation-blocks';
     $request = variations_rest_get_request( $route );
     $variations_all = $request['all_variations'];
     return $variations_all;

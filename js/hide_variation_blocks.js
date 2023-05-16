@@ -10,51 +10,69 @@ async function getVariations() {
             'X-WP-Header' : 'nonce'
         }
     });
-    const result = await response.json();
-        // console.log(result);
-        // const all_array = Object.values(result['all_variations']);
+        const result = await response.json();
+            console.log(result);
+        return result;    
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
 
-        // function to get parent block name and add as prefix (eg. "core/" + block.name)
-        function addPrefix(parent, suffix) {
-            const fullName = parent + "/" + suffix;
-            console.log(fullName);
-            return fullName;
+async function getAllVariations() {
+    try {
+        const response = await fetch( '/index.php/wp-json/blocks-settings-main/v1/variation-blocks', {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin' : '*',
+            'X-WP-Header' : 'nonce'
         }
-
-        const all_blocks_array = wp.blocks.getBlockTypes().map((block) => block.name);
-        console.log(all_blocks_array);
-        const all_variations_array = []
-
-        all_blocks_array.forEach((block) => {
-            const individual_block_vars = wp.blocks.getBlockVariations(block);
-            console.log(block);
-            console.log(individual_block_vars);
-
-            const individual_names = individual_block_vars.map((var_name) => var_name.name);
-            individual_names.forEach((block_var) => {
-                
-                block_full_name = addPrefix(block, block_var);
-
-                all_variations_array.push(block_full_name);
-            })
-        })
-        console.log(all_variations_array);
-
+    });
+    const result = await response.json();
+        console.log(result);
+        
+        
+        const all_variations_array = Object.values(result['all_variations']);
+        // next, get array of allowed variations from returned call to php file (which grabs list from wp sitemeta option)
         const allowed_array = Object.values(result['allowed_variations']);
-
+        
+        //for each item in all variations array...
         all_variations_array.forEach((block_var) => {
             //  if item doesn't exist in allowed blocks array, unregister from blocks 
             if(!allowed_array.includes(block_var)) {
+                // get variation name only and if not in whitelist option array, unregister
                 block_var_name = block_var.split('/');
                 block_name = block_var_name[block_var_name.length - 1];
                 wp.blocks.unregisterBlockVariation('core/embed', block_name);
             }
         });
-        
+        return all_variations_array;
     } catch (error) {
         console.error("Error:", error);
     }
 }
+
+const allowed_result = getVariations();
+const all_result = getAllVariations();
+
+const all_variations_array = Object.values(all_result['all_variations']);
+// next, get array of allowed variations from returned call to php file (which grabs list from wp sitemeta option)
+const allowed_array = Object.values(allowed_result['allowed_variations']);
+
+//for each item in all variations array...
+all_variations_array.forEach((block_var) => {
+    //  if item doesn't exist in allowed blocks array, unregister from blocks 
+    if(!allowed_array.includes(block_var)) {
+        // get variation name only and if not in whitelist option array, unregister
+        block_var_name = block_var.split('/');
+        block_name = block_var_name[block_var_name.length - 1];
+        wp.blocks.unregisterBlockVariation('core/embed', block_name);
+    }
+});
+        
+
+
 
 wp.domReady( getVariations );
 
