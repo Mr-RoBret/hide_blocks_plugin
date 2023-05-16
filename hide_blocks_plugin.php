@@ -338,10 +338,10 @@ function get_all_blocks() {
 
     foreach( $block_types as $block ) {
 
-        if( test_for_parent( $block ) ) {
+        // if( test_for_parent( $block ) ) {
             // array_push($block_names, $block->name);
             $block_names[] = $block->name;
-        }
+        // }
     }
     
     // create new array of block names that match the above regex and return
