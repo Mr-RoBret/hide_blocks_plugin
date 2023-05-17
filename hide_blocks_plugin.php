@@ -330,18 +330,9 @@ function get_all_blocks() {
         'acf/st-olaf-youtube'
     );
 
-    function test_for_parent( $block_object ) {
-        if( null == $block_object->parent ) {
-            return true;
-        }
-    }
-
+    // add all registered block types to allowed array
     foreach( $block_types as $block ) {
-
-        if( test_for_parent( $block ) ) {
-            // array_push($block_names, $block->name);
-            $block_names[] = $block->name;
-        }
+        $block_names[] = $block->name;
     }
     
     // create new array of block names that match the above regex and return
