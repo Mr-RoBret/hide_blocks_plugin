@@ -2,7 +2,7 @@
 /*
 Plugin Name: Hide Blocks Plugin
 Description: Provides the list of all registered blocks, including Embed Block variations, with toggles for turning on & off in Block Inserter
-Version: 0.1.5
+Version: 0.1.6
 Contributors: bfarley01
 Author: Bret Farley
 License: GPLv2 or later
@@ -24,7 +24,6 @@ define( 'HIDEBLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
 include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-scripts.php' );
 include( plugin_dir_path( __FILE__ ) . 'includes/get_variation_blocks.php' );
-// include( plugin_dir_path( __FILE__ ) . 'includes/hide-blocks-styles.php' );
 
 $main_blocks_settings_slug = 'blocks-settings-main';
 $block_variations_settings_slug = 'blocks_settings-variation';
@@ -245,7 +244,7 @@ function create_page() {
         <div class="wrap">
             <h1><?php echo esc_attr( get_admin_page_title() ); ?></h1>   
 
-            <form method="post" action="<?php echo add_query_arg( 'action', $main_blocks_settings_slug . '-update', 'edit.php' ) ?>">
+            <form method="post" name="block-settings" action="<?php echo add_query_arg( 'action', $main_blocks_settings_slug . '-update', 'edit.php' ) ?>">
                 <?php
                     settings_fields( 'main-blocks-section', 'variation-blocks-section' );
                     do_settings_sections( $main_blocks_settings_slug, $block_variations_settings_slug );
@@ -307,6 +306,8 @@ function get_all_blocks() {
     $block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
     $block_names_verified = array();
+
+    // first, include all st olaf acf blocks, as they are not picked up by wp's block type registry
     $block_names = array(
         'acf/st-olaf-accordion', 
         'acf/st-olaf-events', 

@@ -11,17 +11,17 @@ async function getVariations() {
         }
     });
     const result = await response.json();
-        // console.log(result);
+
         const all_array = Object.values(result['all_variations']);
         const allowed_array = Object.values(result['allowed_variations']);
 
         all_array.forEach((block_var) => {
             block_var_name = block_var.split('/'); // split full name
-            // console.log(block_var_name);
             block_var_prefix = block_var_name[0];   // get prifix (ie 'core/')
             block_name = block_var_name[block_var_name.length - 1]; // get slug
 
-            //  if item doesn't exist in allowed blocks array, unregister from blocks AND if block_var starts with ('core/embed')
+            //  if item doesn't exist in allowed blocks array AND if block_var starts with ('core/embed'),
+            //  unregister from blocks
             if(!allowed_array.includes(block_var) && block_var_prefix === 'embed') { 
                 wp.blocks.unregisterBlockVariation('core/embed', block_name);
             }
