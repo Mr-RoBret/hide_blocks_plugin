@@ -14,6 +14,15 @@
                 wp_script_add_data( 'my-script', 'position', 10 
             );
         }
+
+        if ( is_admin() && $pagenow === 'settings.php' ) {
+            wp_enqueue_script( 
+                'table_styles', 
+                HIDEBLOCKS_URL . 'js/table_styles.js', __FILE__ , 
+                array( 'wp-blocks', 'wp-dom-ready' ), '1.0', true
+            );
+        }
+
     }
 
     add_action( 'admin_enqueue_scripts', 'my_enqueue_script' );
@@ -33,6 +42,8 @@ function inserter_scripts() {
     }
 
 add_action( 'enqueue_block_editor_assets', 'inserter_scripts' );
+
+
 
 
 /**

@@ -233,6 +233,7 @@ function get_all_variation_blocks() {
  * This creates the settings page itself.
  */
 function create_page() {
+
     $main_blocks_settings_slug = $GLOBALS[ 'main_blocks_settings_slug' ];
     $block_variations_settings_slug = $GLOBALS[ 'block_variations_settings_slug' ];
     ?>
