@@ -2,7 +2,7 @@
 /*
 Plugin Name: Hide Blocks Plugin
 Description: Provides the list of all registered blocks, including Embed Block variations, with toggles for turning on & off in Block Inserter
-Version: 0.1.6
+Version: 0.1.7
 Contributors: bfarley01
 Author: Bret Farley
 License: GPLv2 or later
