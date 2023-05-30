@@ -55,22 +55,22 @@
             ] );
     }
 
-    // function get_permissions_callback() {
-    //     if ( ! current_user_can( 'manage_network_options' ) ) {
-    //         return new WP_Error( 'rest_forbidden ', 
-    //         esc_html__( 'OMG you cannot view private data.', 
-    //         'multisite-settings' ), 
-    //         array( 'status' => 401 ) );
-    //     }
-    //     return true;
-    // }
+    function get_permissions_callback() {
+        if ( !current_user_can( 'manage_network_options' ) ) {
+            return new WP_Error( 'rest_forbidden ', 
+            esc_html__( 'You do not have access to these settings.', 
+            'multisite-settings' ), 
+            array( 'status' => 401 ) );
+        }
+        return true;
+    }
 
     function multisite_settings_register_api_routes() {
 
         register_rest_route( 'blocks-settings-main/v1', '/main-blocks', array(
             'methods' => WP_REST_Server::READABLE,
             'callback' => 'multisite_settings_get_variations',
-            // 'permission_callback' => 'get_permissions_callback'
+            'permission_callback' => 'get_permissions_callback'
         ) );
 
     }
