@@ -4,7 +4,7 @@
     function my_enqueue_script() {
         global $pagenow;
         
-        if ( is_admin() && $pagenow === 'post.php' ) {
+        if ( is_admin() && ( $pagenow === 'post.php' || $pagenow === 'post-new.php' ) ) {
 
             wp_enqueue_script( 
                 'hide_variation_blocks', 
@@ -66,5 +66,3 @@ function write_to_console($data, $context = 'Debug in Console') {
     echo $output;
 
 }
-
-?>
